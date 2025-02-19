@@ -1,0 +1,848 @@
+# carton snapshot format: version 1.0
+DISTRIBUTIONS
+  Alien-Build-2.84
+    pathname: P/PL/PLICEASE/Alien-Build-2.84.tar.gz
+    provides:
+      Alien::Base 2.84
+      Alien::Base::PkgConfig 2.84
+      Alien::Base::Wrapper 2.84
+      Alien::Build 2.84
+      Alien::Build::CommandSequence 2.84
+      Alien::Build::Helper 2.84
+      Alien::Build::Interpolate 2.84
+      Alien::Build::Interpolate::Default 2.84
+      Alien::Build::Interpolate::Helper 2.84
+      Alien::Build::Log 2.84
+      Alien::Build::Log::Abbreviate 2.84
+      Alien::Build::Log::Default 2.84
+      Alien::Build::MM 2.84
+      Alien::Build::Meta 2.84
+      Alien::Build::Plugin 2.84
+      Alien::Build::Plugin::Build::Autoconf 2.84
+      Alien::Build::Plugin::Build::CMake 2.84
+      Alien::Build::Plugin::Build::Copy 2.84
+      Alien::Build::Plugin::Build::MSYS 2.84
+      Alien::Build::Plugin::Build::Make 2.84
+      Alien::Build::Plugin::Build::SearchDep 2.84
+      Alien::Build::Plugin::Core::CleanInstall 2.84
+      Alien::Build::Plugin::Core::Download 2.84
+      Alien::Build::Plugin::Core::FFI 2.84
+      Alien::Build::Plugin::Core::Gather 2.84
+      Alien::Build::Plugin::Core::Legacy 2.84
+      Alien::Build::Plugin::Core::Override 2.84
+      Alien::Build::Plugin::Core::Setup 2.84
+      Alien::Build::Plugin::Core::Tail 2.84
+      Alien::Build::Plugin::Decode::DirListing 2.84
+      Alien::Build::Plugin::Decode::DirListingFtpcopy 2.84
+      Alien::Build::Plugin::Decode::HTML 2.84
+      Alien::Build::Plugin::Decode::Mojo 2.84
+      Alien::Build::Plugin::Digest::Negotiate 2.84
+      Alien::Build::Plugin::Digest::SHA 2.84
+      Alien::Build::Plugin::Digest::SHAPP 2.84
+      Alien::Build::Plugin::Download::Negotiate 2.84
+      Alien::Build::Plugin::Extract::ArchiveTar 2.84
+      Alien::Build::Plugin::Extract::ArchiveZip 2.84
+      Alien::Build::Plugin::Extract::CommandLine 2.84
+      Alien::Build::Plugin::Extract::Directory 2.84
+      Alien::Build::Plugin::Extract::File 2.84
+      Alien::Build::Plugin::Extract::Negotiate 2.84
+      Alien::Build::Plugin::Fetch::CurlCommand 2.84
+      Alien::Build::Plugin::Fetch::HTTPTiny 2.84
+      Alien::Build::Plugin::Fetch::LWP 2.84
+      Alien::Build::Plugin::Fetch::Local 2.84
+      Alien::Build::Plugin::Fetch::LocalDir 2.84
+      Alien::Build::Plugin::Fetch::NetFTP 2.84
+      Alien::Build::Plugin::Fetch::Wget 2.84
+      Alien::Build::Plugin::Gather::IsolateDynamic 2.84
+      Alien::Build::Plugin::PkgConfig::CommandLine 2.84
+      Alien::Build::Plugin::PkgConfig::LibPkgConf 2.84
+      Alien::Build::Plugin::PkgConfig::MakeStatic 2.84
+      Alien::Build::Plugin::PkgConfig::Negotiate 2.84
+      Alien::Build::Plugin::PkgConfig::PP 2.84
+      Alien::Build::Plugin::Prefer::BadVersion 2.84
+      Alien::Build::Plugin::Prefer::GoodVersion 2.84
+      Alien::Build::Plugin::Prefer::SortVersions 2.84
+      Alien::Build::Plugin::Probe::CBuilder 2.84
+      Alien::Build::Plugin::Probe::CommandLine 2.84
+      Alien::Build::Plugin::Probe::Vcpkg 2.84
+      Alien::Build::Plugin::Test::Mock 2.84
+      Alien::Build::PluginMeta 2.84
+      Alien::Build::Temp 2.84
+      Alien::Build::TempDir 2.84
+      Alien::Build::Util 2.84
+      Alien::Build::Version::Basic 2.84
+      Alien::Build::rc 2.84
+      Alien::Role 2.84
+      Alien::Util 2.84
+      Test::Alien 2.84
+      Test::Alien::Build 2.84
+      Test::Alien::CanCompile 2.84
+      Test::Alien::CanPlatypus 2.84
+      Test::Alien::Diag 2.84
+      Test::Alien::Run 2.84
+      Test::Alien::Synthetic 2.84
+      alienfile 2.84
+    requirements:
+      Capture::Tiny 0.17
+      Digest::SHA 0
+      ExtUtils::CBuilder 0
+      ExtUtils::MakeMaker 6.64
+      ExtUtils::ParseXS 3.30
+      FFI::CheckLib 0.11
+      File::Which 1.10
+      File::chdir 0
+      JSON::PP 0
+      List::Util 1.33
+      Path::Tiny 0.077
+      Test2::API 1.302096
+      Text::ParseWords 3.26
+      parent 0
+      perl 5.008004
+  Alien-hiredis-0.013
+    pathname: D/DB/DBOOK/Alien-hiredis-0.013.tar.gz
+    provides:
+      Alien::hiredis 0.013
+    requirements:
+      Alien::Base 0.038
+      Alien::Build 1.74
+      Alien::Build::MM 1.74
+      Alien::Build::Plugin::Build::Make 0.99
+      Alien::Build::Plugin::Gather::IsolateDynamic 0.48
+      Archive::Tar 0
+      ExtUtils::MakeMaker 6.52
+      HTTP::Tiny 0.044
+      IO::Socket::SSL 1.56
+      IO::Zlib 0
+      Mozilla::CA 0
+      Net::SSLeay 1.49
+      URI 0
+      parent 0
+      perl 5.008001
+  Capture-Tiny-0.50
+    pathname: D/DA/DAGOLDEN/Capture-Tiny-0.50.tar.gz
+    provides:
+      Capture::Tiny 0.50
+    requirements:
+      Carp 0
+      Exporter 0
+      ExtUtils::MakeMaker 6.17
+      File::Spec 0
+      File::Temp 0
+      IO::Handle 0
+      Scalar::Util 0
+      perl 5.006
+      strict 0
+      warnings 0
+  Class-Method-Modifiers-2.15
+    pathname: E/ET/ETHER/Class-Method-Modifiers-2.15.tar.gz
+    provides:
+      Class::Method::Modifiers 2.15
+    requirements:
+      B 0
+      Carp 0
+      Exporter 0
+      ExtUtils::MakeMaker 0
+      base 0
+      perl 5.006
+      strict 0
+      warnings 0
+  Cpanel-JSON-XS-4.39
+    pathname: R/RU/RURBAN/Cpanel-JSON-XS-4.39.tar.gz
+    provides:
+      Cpanel::JSON::XS 4.39
+      Cpanel::JSON::XS::Type undef
+    requirements:
+      Carp 0
+      Config 0
+      Encode 1.9801
+      Exporter 0
+      ExtUtils::MakeMaker 0
+      Pod::Text 2.08
+      XSLoader 0
+      overload 0
+      strict 0
+      warnings 0
+  Env-Dot-0.018
+    pathname: M/MI/MIKKOI/Env-Dot-0.018.tar.gz
+    provides:
+      Env::Dot 0.018
+      Env::Dot::Functions 0.018
+      Env::Dot::ScriptFunctions 0.018
+    requirements:
+      Carp 0
+      Cwd 0
+      English 0
+      Exporter 0
+      ExtUtils::MakeMaker 0
+      File::Spec 0
+      Getopt::Long 0
+      IO::File 0
+      Pod::Usage 0
+      constant 0
+      open 0
+      perl 5.010
+      strict 0
+      warnings 0
+  Exporter-Tiny-1.006002
+    pathname: T/TO/TOBYINK/Exporter-Tiny-1.006002.tar.gz
+    provides:
+      Exporter::Shiny 1.006002
+      Exporter::Tiny 1.006002
+    requirements:
+      ExtUtils::MakeMaker 6.17
+      perl 5.006001
+  ExtUtils-Depends-0.8001
+    pathname: X/XA/XAOC/ExtUtils-Depends-0.8001.tar.gz
+    provides:
+      ExtUtils::Depends 0.8001
+    requirements:
+      Data::Dumper 0
+      ExtUtils::MakeMaker 7.44
+      File::Spec 0
+      IO::File 0
+      perl 5.006
+  FFI-CheckLib-0.31
+    pathname: P/PL/PLICEASE/FFI-CheckLib-0.31.tar.gz
+    provides:
+      FFI::CheckLib 0.31
+    requirements:
+      ExtUtils::MakeMaker 0
+      File::Which 0
+      List::Util 1.33
+      perl 5.006
+  File-Which-1.27
+    pathname: P/PL/PLICEASE/File-Which-1.27.tar.gz
+    provides:
+      File::Which 1.27
+    requirements:
+      ExtUtils::MakeMaker 0
+      base 0
+      perl 5.006
+  File-chdir-0.1011
+    pathname: D/DA/DAGOLDEN/File-chdir-0.1011.tar.gz
+    provides:
+      File::chdir 0.1011
+      File::chdir::ARRAY 0.1011
+      File::chdir::SCALAR 0.1011
+    requirements:
+      Carp 0
+      Cwd 3.16
+      Exporter 0
+      ExtUtils::MakeMaker 6.17
+      File::Spec::Functions 3.27
+      perl 5.006
+      strict 0
+      vars 0
+  IO-Socket-SSL-2.089
+    pathname: S/SU/SULLR/IO-Socket-SSL-2.089.tar.gz
+    provides:
+      IO::Socket::SSL 2.089
+      IO::Socket::SSL::Intercept 2.056
+      IO::Socket::SSL::OCSP_Cache 2.089
+      IO::Socket::SSL::OCSP_Resolver 2.089
+      IO::Socket::SSL::PublicSuffix undef
+      IO::Socket::SSL::SSL_Context 2.089
+      IO::Socket::SSL::SSL_HANDLE 2.089
+      IO::Socket::SSL::Session_Cache 2.089
+      IO::Socket::SSL::Trace 2.089
+      IO::Socket::SSL::Utils 2.015
+    requirements:
+      ExtUtils::MakeMaker 0
+      Net::SSLeay 1.46
+      Scalar::Util 0
+  IRC-Utils-0.12
+    pathname: H/HI/HINRIK/IRC-Utils-0.12.tar.gz
+    provides:
+      IRC::Utils 0.12
+    requirements:
+      ExtUtils::MakeMaker 6.30
+  List-AllUtils-0.19
+    pathname: D/DR/DROLSKY/List-AllUtils-0.19.tar.gz
+    provides:
+      List::AllUtils 0.19
+    requirements:
+      Exporter 0
+      ExtUtils::MakeMaker 0
+      List::SomeUtils 0.58
+      List::Util 1.56
+      List::UtilsBy 0.11
+      base 0
+      strict 0
+      warnings 0
+  List-SomeUtils-0.59
+    pathname: D/DR/DROLSKY/List-SomeUtils-0.59.tar.gz
+    provides:
+      List::SomeUtils 0.59
+      List::SomeUtils::PP 0.59
+    requirements:
+      Carp 0
+      Exporter 0
+      ExtUtils::MakeMaker 0
+      List::SomeUtils::XS 0.54
+      List::Util 0
+      Module::Implementation 0.04
+      Text::ParseWords 0
+      perl 5.006
+      strict 0
+      vars 0
+      warnings 0
+  List-SomeUtils-XS-0.58
+    pathname: D/DR/DROLSKY/List-SomeUtils-XS-0.58.tar.gz
+    provides:
+      List::SomeUtils::XS 0.58
+    requirements:
+      ExtUtils::MakeMaker 0
+      XSLoader 0
+      strict 0
+      warnings 0
+  List-UtilsBy-0.12
+    pathname: P/PE/PEVANS/List-UtilsBy-0.12.tar.gz
+    provides:
+      List::UtilsBy 0.12
+    requirements:
+      Exporter 5.57
+      Module::Build 0.4004
+  MIME-Base32-1.303
+    pathname: R/RE/REHSACK/MIME-Base32-1.303.tar.gz
+    provides:
+      MIME::Base32 1.303
+    requirements:
+      Exporter 0
+      ExtUtils::MakeMaker 0
+      perl 5.008001
+      utf8 0
+  Module-Build-0.4234
+    pathname: L/LE/LEONT/Module-Build-0.4234.tar.gz
+    provides:
+      Module::Build 0.4234
+      Module::Build::Base 0.4234
+      Module::Build::Compat 0.4234
+      Module::Build::Config 0.4234
+      Module::Build::Cookbook 0.4234
+      Module::Build::Dumper 0.4234
+      Module::Build::Notes 0.4234
+      Module::Build::PPMMaker 0.4234
+      Module::Build::Platform::Default 0.4234
+      Module::Build::Platform::MacOS 0.4234
+      Module::Build::Platform::Unix 0.4234
+      Module::Build::Platform::VMS 0.4234
+      Module::Build::Platform::VOS 0.4234
+      Module::Build::Platform::Windows 0.4234
+      Module::Build::Platform::aix 0.4234
+      Module::Build::Platform::cygwin 0.4234
+      Module::Build::Platform::darwin 0.4234
+      Module::Build::Platform::os2 0.4234
+      Module::Build::PodParser 0.4234
+    requirements:
+      CPAN::Meta 2.142060
+      Cwd 0
+      Data::Dumper 0
+      ExtUtils::CBuilder 0.27
+      ExtUtils::Install 0
+      ExtUtils::Manifest 0
+      ExtUtils::Mkbootstrap 0
+      ExtUtils::ParseXS 2.21
+      File::Basename 0
+      File::Compare 0
+      File::Copy 0
+      File::Find 0
+      File::Path 0
+      File::Spec 0.82
+      Getopt::Long 0
+      Module::Metadata 1.000002
+      Perl::OSType 1
+      TAP::Harness 3.29
+      Text::Abbrev 0
+      Text::ParseWords 0
+      perl 5.006001
+      version 0.87
+  Module-Implementation-0.09
+    pathname: D/DR/DROLSKY/Module-Implementation-0.09.tar.gz
+    provides:
+      Module::Implementation 0.09
+    requirements:
+      Carp 0
+      ExtUtils::MakeMaker 0
+      Module::Runtime 0.012
+      Try::Tiny 0
+      strict 0
+      warnings 0
+  Module-Runtime-0.016
+    pathname: Z/ZE/ZEFRAM/Module-Runtime-0.016.tar.gz
+    provides:
+      Module::Runtime 0.016
+    requirements:
+      Module::Build 0
+      Test::More 0.41
+      perl 5.006
+      strict 0
+      warnings 0
+  Mojo-IRC-0.47
+    pathname: J/JH/JHTHORSEN/Mojo-IRC-0.47.tar.gz
+    provides:
+      Mojo::IRC 0.47
+      Mojo::IRC::UA undef
+      Test::Mojo::IRC undef
+    requirements:
+      ExtUtils::MakeMaker 0
+      IRC::Utils 0.12
+      List::Util 1.33
+      Mojolicious 8.00
+      Parse::IRC 1.20
+      Unicode::UTF8 0.59
+      perl 5.016
+  Mojo-Redis-3.29
+    pathname: J/JH/JHTHORSEN/Mojo-Redis-3.29.tar.gz
+    provides:
+      Mojo::Redis 3.29
+      Mojo::Redis::Cache undef
+      Mojo::Redis::Connection undef
+      Mojo::Redis::Connection::Offline undef
+      Mojo::Redis::Cursor undef
+      Mojo::Redis::Database undef
+      Mojo::Redis::PubSub undef
+    requirements:
+      ExtUtils::MakeMaker 0
+      Mojolicious 8.50
+      Protocol::Redis::Faster 0.002
+      perl 5.016
+  Mojolicious-9.39
+    pathname: S/SR/SRI/Mojolicious-9.39.tar.gz
+    provides:
+      Mojo undef
+      Mojo::Asset undef
+      Mojo::Asset::File undef
+      Mojo::Asset::Memory undef
+      Mojo::Base undef
+      Mojo::BaseUtil undef
+      Mojo::ByteStream undef
+      Mojo::Cache undef
+      Mojo::Collection undef
+      Mojo::Content undef
+      Mojo::Content::MultiPart undef
+      Mojo::Content::Single undef
+      Mojo::Cookie undef
+      Mojo::Cookie::Request undef
+      Mojo::Cookie::Response undef
+      Mojo::DOM undef
+      Mojo::DOM::CSS undef
+      Mojo::DOM::HTML undef
+      Mojo::Date undef
+      Mojo::DynamicMethods undef
+      Mojo::EventEmitter undef
+      Mojo::Exception undef
+      Mojo::File undef
+      Mojo::Headers undef
+      Mojo::HelloWorld undef
+      Mojo::Home undef
+      Mojo::IOLoop undef
+      Mojo::IOLoop::Client undef
+      Mojo::IOLoop::Server undef
+      Mojo::IOLoop::Stream undef
+      Mojo::IOLoop::Subprocess undef
+      Mojo::IOLoop::TLS undef
+      Mojo::JSON undef
+      Mojo::JSON::Pointer undef
+      Mojo::Loader undef
+      Mojo::Log undef
+      Mojo::Message undef
+      Mojo::Message::Request undef
+      Mojo::Message::Response undef
+      Mojo::Parameters undef
+      Mojo::Path undef
+      Mojo::Promise undef
+      Mojo::Reactor undef
+      Mojo::Reactor::EV undef
+      Mojo::Reactor::Poll undef
+      Mojo::Server undef
+      Mojo::Server::CGI undef
+      Mojo::Server::Daemon undef
+      Mojo::Server::Hypnotoad undef
+      Mojo::Server::Morbo undef
+      Mojo::Server::Morbo::Backend undef
+      Mojo::Server::Morbo::Backend::Poll undef
+      Mojo::Server::PSGI undef
+      Mojo::Server::Prefork undef
+      Mojo::Template undef
+      Mojo::Transaction undef
+      Mojo::Transaction::HTTP undef
+      Mojo::Transaction::WebSocket undef
+      Mojo::URL undef
+      Mojo::Upload undef
+      Mojo::UserAgent undef
+      Mojo::UserAgent::CookieJar undef
+      Mojo::UserAgent::Proxy undef
+      Mojo::UserAgent::Server undef
+      Mojo::UserAgent::Transactor undef
+      Mojo::Util undef
+      Mojo::WebSocket undef
+      Mojolicious 9.39
+      Mojolicious::Command undef
+      Mojolicious::Command::Author::cpanify undef
+      Mojolicious::Command::Author::generate undef
+      Mojolicious::Command::Author::generate::app undef
+      Mojolicious::Command::Author::generate::dockerfile undef
+      Mojolicious::Command::Author::generate::lite_app undef
+      Mojolicious::Command::Author::generate::makefile undef
+      Mojolicious::Command::Author::generate::plugin undef
+      Mojolicious::Command::Author::inflate undef
+      Mojolicious::Command::cgi undef
+      Mojolicious::Command::daemon undef
+      Mojolicious::Command::eval undef
+      Mojolicious::Command::get undef
+      Mojolicious::Command::prefork undef
+      Mojolicious::Command::psgi undef
+      Mojolicious::Command::routes undef
+      Mojolicious::Command::version undef
+      Mojolicious::Commands undef
+      Mojolicious::Controller undef
+      Mojolicious::Lite undef
+      Mojolicious::Plugin undef
+      Mojolicious::Plugin::Config undef
+      Mojolicious::Plugin::DefaultHelpers undef
+      Mojolicious::Plugin::EPLRenderer undef
+      Mojolicious::Plugin::EPRenderer undef
+      Mojolicious::Plugin::HeaderCondition undef
+      Mojolicious::Plugin::JSONConfig undef
+      Mojolicious::Plugin::Mount undef
+      Mojolicious::Plugin::NotYAMLConfig undef
+      Mojolicious::Plugin::TagHelpers undef
+      Mojolicious::Plugins undef
+      Mojolicious::Renderer undef
+      Mojolicious::Routes undef
+      Mojolicious::Routes::Match undef
+      Mojolicious::Routes::Pattern undef
+      Mojolicious::Routes::Route undef
+      Mojolicious::Sessions undef
+      Mojolicious::Static undef
+      Mojolicious::Types undef
+      Mojolicious::Validator undef
+      Mojolicious::Validator::Validation undef
+      Test::Mojo undef
+      ojo undef
+    requirements:
+      ExtUtils::MakeMaker 0
+      IO::Socket::IP 0.37
+      Sub::Util 1.41
+      perl 5.016
+  Moo-2.005005
+    pathname: H/HA/HAARG/Moo-2.005005.tar.gz
+    provides:
+      Method::Generate::Accessor undef
+      Method::Generate::BuildAll undef
+      Method::Generate::Constructor undef
+      Method::Generate::DemolishAll undef
+      Moo 2.005005
+      Moo::HandleMoose undef
+      Moo::HandleMoose::FakeConstructor undef
+      Moo::HandleMoose::FakeMetaClass undef
+      Moo::HandleMoose::_TypeMap undef
+      Moo::Object undef
+      Moo::Role 2.005005
+      Moo::_Utils undef
+      Moo::sification undef
+      oo undef
+    requirements:
+      Carp 0
+      Class::Method::Modifiers 1.10
+      Exporter 0
+      ExtUtils::MakeMaker 0
+      Role::Tiny 2.002003
+      Scalar::Util 1.00
+      Sub::Defer 2.006006
+      Sub::Quote 2.006006
+      perl 5.006
+  Mooish-AttributeBuilder-1.003
+    pathname: B/BR/BRTASTIC/Mooish-AttributeBuilder-1.003.tar.gz
+    provides:
+      Mooish::AttributeBuilder 1.003
+    requirements:
+      ExtUtils::MakeMaker 0
+      perl 5.010
+  Mozilla-CA-20250202
+    pathname: L/LW/LWP/Mozilla-CA-20250202.tar.gz
+    provides:
+      Mozilla::CA 20250202
+    requirements:
+      ExtUtils::MakeMaker 0
+  Net-SSLeay-1.94
+    pathname: C/CH/CHRISN/Net-SSLeay-1.94.tar.gz
+    provides:
+      Net::SSLeay 1.94
+      Net::SSLeay::Handle 1.94
+    requirements:
+      English 0
+      ExtUtils::MakeMaker 0
+      File::Spec::Functions 0
+      MIME::Base64 0
+      Text::Wrap 0
+      constant 0
+      perl 5.008001
+  Parse-IRC-1.22
+    pathname: B/BI/BINGOS/Parse-IRC-1.22.tar.gz
+    provides:
+      Parse::IRC 1.22
+    requirements:
+      ExtUtils::MakeMaker 6.59
+      Test::More 0.47
+      perl 5.006
+  Path-Tiny-0.146
+    pathname: D/DA/DAGOLDEN/Path-Tiny-0.146.tar.gz
+    provides:
+      Path::Tiny 0.146
+      Path::Tiny::Error 0.146
+    requirements:
+      Carp 0
+      Cwd 0
+      Digest 1.03
+      Digest::SHA 5.45
+      Encode 0
+      Exporter 5.57
+      ExtUtils::MakeMaker 6.17
+      Fcntl 0
+      File::Compare 0
+      File::Copy 0
+      File::Glob 0
+      File::Path 2.07
+      File::Spec 0.86
+      File::Temp 0.19
+      File::stat 0
+      constant 0
+      overload 0
+      perl 5.008001
+      strict 0
+      warnings 0
+      warnings::register 0
+  Protocol-Redis-1.0021
+    pathname: U/UN/UNDEF/Protocol-Redis-1.0021.tar.gz
+    provides:
+      Protocol::Redis 1.0021
+      Protocol::Redis::Test undef
+    requirements:
+      Carp 0
+      ExtUtils::MakeMaker 0
+      Test::More 0.94
+      perl 5.008001
+  Protocol-Redis-Faster-0.003
+    pathname: D/DB/DBOOK/Protocol-Redis-Faster-0.003.tar.gz
+    provides:
+      Protocol::Redis::Faster 0.003
+    requirements:
+      Carp 0
+      ExtUtils::MakeMaker 0
+      Protocol::Redis 1.0000
+      parent 0
+      perl 5.008001
+  Protocol-Redis-XS-0.09
+    pathname: D/DB/DBOOK/Protocol-Redis-XS-0.09.tar.gz
+    provides:
+      Protocol::Redis::XS 0.09
+    requirements:
+      Alien::Base 1.65
+      Alien::hiredis 0.003
+      ExtUtils::Depends 0
+      ExtUtils::MakeMaker 6.31
+      Protocol::Redis 1.0021
+      XS::Object::Magic 0
+      XSLoader 0
+      parent 0
+      perl 5.008001
+  Role-Tiny-2.002004
+    pathname: H/HA/HAARG/Role-Tiny-2.002004.tar.gz
+    provides:
+      Role::Tiny 2.002004
+      Role::Tiny::With 2.002004
+    requirements:
+      Exporter 5.57
+      perl 5.006
+  Sub-Quote-2.006008
+    pathname: H/HA/HAARG/Sub-Quote-2.006008.tar.gz
+    provides:
+      Sub::Defer 2.006008
+      Sub::Quote 2.006008
+    requirements:
+      ExtUtils::MakeMaker 0
+      Scalar::Util 0
+      perl 5.006
+  Test-Fatal-0.017
+    pathname: R/RJ/RJBS/Test-Fatal-0.017.tar.gz
+    provides:
+      Test::Fatal 0.017
+    requirements:
+      Carp 0
+      Exporter 5.57
+      ExtUtils::MakeMaker 6.78
+      Test::Builder 0
+      Try::Tiny 0.07
+      strict 0
+      warnings 0
+  Try-Tiny-0.32
+    pathname: E/ET/ETHER/Try-Tiny-0.32.tar.gz
+    provides:
+      Try::Tiny 0.32
+    requirements:
+      Carp 0
+      Exporter 5.57
+      ExtUtils::MakeMaker 0
+      constant 0
+      perl 5.006
+      strict 0
+      warnings 0
+  Type-Tiny-2.006000
+    pathname: T/TO/TOBYINK/Type-Tiny-2.006000.tar.gz
+    provides:
+      Devel::TypeTiny::Perl58Compat 2.006000
+      Error::TypeTiny 2.006000
+      Error::TypeTiny::Assertion 2.006000
+      Error::TypeTiny::Compilation 2.006000
+      Error::TypeTiny::WrongNumberOfParameters 2.006000
+      Eval::TypeTiny 2.006000
+      Eval::TypeTiny::CodeAccumulator 2.006000
+      Reply::Plugin::TypeTiny 2.006000
+      Test::TypeTiny 2.006000
+      Type::Coercion 2.006000
+      Type::Coercion::FromMoose 2.006000
+      Type::Coercion::Union 2.006000
+      Type::Library 2.006000
+      Type::Params 2.006000
+      Type::Params::Alternatives 2.006000
+      Type::Params::Parameter 2.006000
+      Type::Params::Signature 2.006000
+      Type::Parser 2.006000
+      Type::Parser::AstBuilder 2.006000
+      Type::Parser::Token 2.006000
+      Type::Parser::TokenStream 2.006000
+      Type::Registry 2.006000
+      Type::Tie 2.006000
+      Type::Tie::ARRAY 2.006000
+      Type::Tie::BASE 2.006000
+      Type::Tie::HASH 2.006000
+      Type::Tie::SCALAR 2.006000
+      Type::Tiny 2.006000
+      Type::Tiny::Bitfield 2.006000
+      Type::Tiny::Class 2.006000
+      Type::Tiny::ConstrainedObject 2.006000
+      Type::Tiny::Duck 2.006000
+      Type::Tiny::Enum 2.006000
+      Type::Tiny::Intersection 2.006000
+      Type::Tiny::Role 2.006000
+      Type::Tiny::Union 2.006000
+      Type::Utils 2.006000
+      Types::Common 2.006000
+      Types::Common::Numeric 2.006000
+      Types::Common::String 2.006000
+      Types::Standard 2.006000
+      Types::Standard::ArrayRef 2.006000
+      Types::Standard::CycleTuple 2.006000
+      Types::Standard::Dict 2.006000
+      Types::Standard::HashRef 2.006000
+      Types::Standard::Map 2.006000
+      Types::Standard::ScalarRef 2.006000
+      Types::Standard::StrMatch 2.006000
+      Types::Standard::Tied 2.006000
+      Types::Standard::Tuple 2.006000
+      Types::TypeTiny 2.006000
+    requirements:
+      Exporter::Tiny 1.006000
+      ExtUtils::MakeMaker 6.17
+      perl 5.008001
+  URI-5.31
+    pathname: O/OA/OALDERS/URI-5.31.tar.gz
+    provides:
+      URI 5.31
+      URI::Escape 5.31
+      URI::Heuristic 5.31
+      URI::IRI 5.31
+      URI::QueryParam 5.31
+      URI::Split 5.31
+      URI::URL 5.31
+      URI::WithBase 5.31
+      URI::data 5.31
+      URI::file 5.31
+      URI::file::Base 5.31
+      URI::file::FAT 5.31
+      URI::file::Mac 5.31
+      URI::file::OS2 5.31
+      URI::file::QNX 5.31
+      URI::file::Unix 5.31
+      URI::file::Win32 5.31
+      URI::ftp 5.31
+      URI::ftpes 5.31
+      URI::ftps 5.31
+      URI::geo 5.31
+      URI::gopher 5.31
+      URI::http 5.31
+      URI::https 5.31
+      URI::icap 5.31
+      URI::icaps 5.31
+      URI::irc 5.31
+      URI::ircs 5.31
+      URI::ldap 5.31
+      URI::ldapi 5.31
+      URI::ldaps 5.31
+      URI::mailto 5.31
+      URI::mms 5.31
+      URI::news 5.31
+      URI::nntp 5.31
+      URI::nntps 5.31
+      URI::otpauth 5.31
+      URI::pop 5.31
+      URI::rlogin 5.31
+      URI::rsync 5.31
+      URI::rtsp 5.31
+      URI::rtspu 5.31
+      URI::scp 5.31
+      URI::sftp 5.31
+      URI::sip 5.31
+      URI::sips 5.31
+      URI::snews 5.31
+      URI::ssh 5.31
+      URI::telnet 5.31
+      URI::tn3270 5.31
+      URI::urn 5.31
+      URI::urn::isbn 5.31
+      URI::urn::oid 5.31
+    requirements:
+      Carp 0
+      Cwd 0
+      Data::Dumper 0
+      Encode 0
+      Exporter 5.57
+      ExtUtils::MakeMaker 0
+      MIME::Base32 0
+      MIME::Base64 2
+      Net::Domain 0
+      Scalar::Util 0
+      constant 0
+      integer 0
+      overload 0
+      parent 0
+      perl 5.008001
+      strict 0
+      utf8 0
+      warnings 0
+  Unicode-UTF8-0.62
+    pathname: C/CH/CHANSEN/Unicode-UTF8-0.62.tar.gz
+    provides:
+      Unicode::UTF8 0.62
+    requirements:
+      Carp 0
+      Encode 1.9801
+      Exporter 0
+      ExtUtils::MakeMaker 6.59
+      Test::Fatal 0.006
+      Test::More 0.47
+      XSLoader 0
+      perl 5.008001
+  XS-Object-Magic-0.05
+    pathname: E/ET/ETHER/XS-Object-Magic-0.05.tar.gz
+    provides:
+      XS::Object::Magic 0.05
+    requirements:
+      DynaLoader 0
+      ExtUtils::Depends 0.302
+      ExtUtils::MakeMaker 0
+      parent 0
+      perl 5.008001
+      strict 0
+      warnings 0
