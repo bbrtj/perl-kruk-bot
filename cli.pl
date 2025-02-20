@@ -10,8 +10,8 @@ binmode STDOUT, ':encoding(UTF-8)';
 binmode STDIN, ':encoding(UTF-8)';
 
 my $bot = Bot->new;
-my $channel = 'terminal';
-my $user = 'terminal';
+my $channel = $bot->owner;
+my $user = $bot->owner;
 my $awaiting_response = !!0;
 my $awaiting_input = !!0;
 

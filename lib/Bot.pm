@@ -8,6 +8,7 @@ use Types::Common -types;
 use Mojo::UserAgent;
 use Mojo::Template;
 use Data::Dumper;
+use List::Util qw(none);
 
 use Bot::Notes;
 
@@ -24,6 +25,18 @@ has field 'claude_config' => (
 has param 'history_size' => (
 	isa => PositiveInt,
 	default => 25,
+);
+
+has param 'owner' => (
+	isa => SimpleStr,
+	default => $ENV{KRUK_OWNER},
+);
+
+has param 'trusted_users' => (
+	isa => ArrayRef,
+	default => sub {
+		[split /,/, $ENV{KRUK_TRUSTED_USERS}]
+	}
 );
 
 has field 'observed_messages' => (
@@ -238,6 +251,13 @@ sub handle_command ($self, $channel, $user, $message, $ret_sub)
 sub query_bot ($self, $channel, $user, $ret_sub)
 {
 	$channel //= $user;
+
+	if ($channel eq $user && none { fc $user eq fc } $self->trusted_users->@*) {
+		my $owner = $self->owner;
+		$ret_sub->(qq{I'm sorry, but your name "$user" is not allowed to use my AI in private chat. Ask "$owner" to add you to trusted users});
+		return;
+	}
+
 	$self->ua->post_p(
 		'https://api.anthropic.com/v1/messages',
 		{

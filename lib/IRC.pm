@@ -45,7 +45,7 @@ sub dispatch ($self, $msg)
 
 	my ($user) = $msg->{prefix} =~ /^(\w+)/;
 
-	my $for_me = !!0;
+	my $for_me = $is_private;
 	if ($line =~ /^(\w+):/) {
 		$for_me = fc $1 eq fc $conf->{nick};
 		$line =~ s/^\Q$conf->{nick}:\E//i
