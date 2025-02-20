@@ -1,4 +1,5 @@
 .env
 .carmel
 system.tpl
+notes.*.storage
 

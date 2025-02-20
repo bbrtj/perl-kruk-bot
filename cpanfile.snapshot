@@ -298,6 +298,16 @@ DISTRIBUTIONS
       Try::Tiny 0.07
       strict 0
       warnings 0
+  Tie-SaveLater-0.05
+    pathname: D/DA/DANKOGAI/Tie-SaveLater-0.05.tar.gz
+    provides:
+      Tie::DataDumper 0.05
+      Tie::SaveLater 0.05
+      Tie::Storable 0.05
+      Tie::Storable::More 0.05
+      Tie::YAML 0.05
+    requirements:
+      ExtUtils::MakeMaker 0
   Try-Tiny-0.32
     pathname: E/ET/ETHER/Try-Tiny-0.32.tar.gz
     provides:

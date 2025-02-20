@@ -140,7 +140,7 @@ my %tools = (
 	save_bot_note => {
 		definition => {
 			name => 'save_bot_note',
-			description  => q{Save a note about yourself for later.},
+			description  => q{Save a note about yourself for later (global for all users). Only save important information.},
 			input_schema => {
 				type => 'object',
 				required => ['note', 'reason'],
@@ -179,7 +179,63 @@ sub use_tool ($self, $channel, $user, $tool_data)
 	}]];
 }
 
-sub query_ai ($self, $channel, $user, $ret_sub)
+my %commands = (
+	'/usernotes' => {
+		syntax => '/usernotes (remove <n>)',
+		runner => sub ($self, $channel, $user, @args) {
+			if (!$args[0]) {
+				return "Here are my notes about you:\n" . $self->user_notes->dump(aspect => $user, ordered => !!1);
+			}
+			elsif (@args == 2 && $args[0] eq 'remove' && PositiveOrZeroInt->check($args[1])) {
+				$self->user_notes->remove(aspect => $user, index => $args[1]);
+				return 'Note about you removed.';
+			}
+
+			die 'bad command arguments';
+		},
+	},
+	'/selfnotes' => {
+		syntax => '/selfnotes (remove <n>)',
+		runner => sub ($self, $channel, $user, @args) {
+			if (!$args[0]) {
+				return "Here is my diary:\n" . $self->self_notes->dump(ordered => !!1);
+			}
+			elsif (@args == 2 && $args[0] eq 'remove' && PositiveOrZeroInt->check($args[1])) {
+				$self->self_notes->remove(index => $args[1]);
+				return 'Diary entry removed.';
+			}
+
+			die 'bad command arguments';
+		},
+	},
+);
+
+sub handle_command ($self, $channel, $user, $message, $ret_sub)
+{
+	if ($message =~ m{^\s*(/\w+)(?: (.+))?$}) {
+		my $command = $1;
+		my @args = split /\s+/, $2 // '';
+
+		if ($commands{$command}) {
+			try {
+				$ret_sub->($commands{$command}{runner}->($self, $channel, $user, @args));
+			}
+			catch ($e) {
+				say $e;
+				$ret_sub->('Command error. Usage: ' . $commands{$command}{syntax});
+			}
+		}
+		else {
+			$ret_sub->('Unknown command');
+		}
+
+		return !!1;
+	}
+
+	return !!0;
+}
+
+sub query_bot ($self, $channel, $user, $ret_sub)
 {
 	$channel //= $user;
 	$self->ua->post_p(
@@ -222,7 +278,7 @@ sub query_ai ($self, $channel, $user, $ret_sub)
 
 		if ($res->json->{stop_reason} eq 'tool_use') {
 			# TODO: wait until tools are finished?
-			$self->query_ai($channel, $user, $ret_sub);
+			$self->query_bot($channel, $user, $ret_sub);
 		}
 		else {
 			$self->add_bot_response($user, $reply);

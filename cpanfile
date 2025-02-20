@@ -8,5 +8,7 @@ requires 'Type::Tiny';
 requires 'Mojo::IRC';
 requires 'IO::Socket::SSL';
 
+requires 'Tie::Storable';
+
 # vim: ft=perl
 
