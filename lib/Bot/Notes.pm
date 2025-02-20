@@ -1,4 +1,4 @@
-package Notes;
+package Bot::Notes;
 
 use v5.40;
 

@@ -9,7 +9,7 @@ use Mojo::UserAgent;
 use Mojo::Template;
 use Data::Dumper;
 
-use Notes;
+use Bot::Notes;
 
 has field 'claude_config' => (
 	isa => HashRef,
@@ -37,16 +37,16 @@ has field 'conversations' => (
 );
 
 has field 'self_notes' => (
-	isa => InstanceOf ['Notes'],
+	isa => InstanceOf ['Bot::Notes'],
 	default => sub {
-		Notes->new(context => 'self');
+		Bot::Notes->new(context => 'self');
 	},
 );
 
 has field 'user_notes' => (
-	isa => InstanceOf ['Notes'],
+	isa => InstanceOf ['Bot::Notes'],
 	default => sub {
-		Notes->new(context => 'user');
+		Bot::Notes->new(context => 'user');
 	},
 );
 
