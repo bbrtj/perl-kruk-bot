@@ -7,6 +7,7 @@ use Mooish::AttributeBuilder;
 use Types::Common -types;
 use Mojo::IRC;
 use Mojo::IOLoop;
+use List::Util qw(any);
 use Encode qw(encode decode);
 
 has field 'config' => (
@@ -33,19 +34,6 @@ has field 'irc_instance' => (
 	},
 );
 
-has field 'joined' => (
-	isa => Bool,
-	writer => 1,
-	default => !!0,
-);
-
-# TODO: not needed?
-has field 'identified' => (
-	isa => Bool,
-	writer => 1,
-	default => !!0,
-);
-
 sub dispatch ($self, $msg)
 {
 	my ($channel, $line) = $msg->{params}->@*;
@@ -53,13 +41,15 @@ sub dispatch ($self, $msg)
 
 	my $conf = $self->config;
 	return unless ($is_private && $channel eq $conf->{nick})
-		|| (!$is_private && $channel eq $conf->{channel});
+		|| (!$is_private && any { $_ eq $channel } split /,/, $conf->{channel});
 
 	my ($user) = $msg->{prefix} =~ /^(\w+)/;
 
 	my $for_me = !!0;
 	if ($line =~ /^(\w+):/) {
 		$for_me = fc $1 eq fc $conf->{nick};
+		$line =~ s/^\Q$conf->{nick}:\E//i
+			if $for_me;
 	}
 
 	return {
@@ -113,21 +103,18 @@ sub configure ($self, $react_sub)
 	my $irc = $self->irc_instance;
 
 	$irc->on(irc_mode => sub ($, $msg) {
-		if (!$self->joined) {
-			$irc->write(join => $self->config->{channel});
-			say 'joining channel ' . $self->config->{channel};
+		foreach my $channel (split /,/, $self->config->{channel}) {
+			$irc->write(join => $channel);
+			say 'joining channel ' . $channel;
 		}
 	});
 
 	$irc->on(irc_join => sub ($, $msg) {
-		if ($msg->{params}[0] eq $self->config->{channel}) {
-			$self->set_joined(!!1);
-			say 'joined channel';
-		}
+		say "joined channel $msg->{params}[0]";
 	});
 
 	$irc->on(irc_notice => sub ($, $msg) {
-		if ($msg->{params}[1] =~ /\/msg nickserv identify/i && !$self->identified) {
+		if ($msg->{params}[1] =~ /\/msg nickserv identify/i) {
 			$irc->write(ns => 'identify', $self->config->{password});
 		}
 	});
