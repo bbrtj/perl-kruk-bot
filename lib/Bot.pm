@@ -4,10 +4,12 @@ use v5.40;
 
 use Moo;
 use Mooish::AttributeBuilder;
-use Types::Standard -types;
+use Types::Common -types;
 use Mojo::UserAgent;
 use Mojo::Template;
 use Data::Dumper;
+
+use Notes;
 
 has field 'claude_config' => (
 	isa => HashRef,
@@ -32,6 +34,20 @@ has field 'observed_messages' => (
 has field 'conversations' => (
 	isa => HashRef [Tuple [Str, Str | Object]],
 	default => sub { {} },
+);
+
+has field 'self_notes' => (
+	isa => InstanceOf ['Notes'],
+	default => sub {
+		Notes->new(context => 'self');
+	},
+);
+
+has field 'user_notes' => (
+	isa => InstanceOf ['Notes'],
+	default => sub {
+		Notes->new(context => 'user');
+	},
 );
 
 has field 'ua' => (
@@ -94,6 +110,56 @@ my %tools = (
 			return join "\n",
 				map { "$_->[0] said: $_->[1]" }
 				$self->observed_messages->{$channel}->@*;
+		},
+	},
+	save_user_note => {
+		definition => {
+			name => 'save_user_note',
+			description  => q{Save a note about the user for later. Don't wait for user to tell you to remember something, use it if they share something that may help with conversation.},
+			input_schema => {
+				type => 'object',
+				required => ['note', 'reason'],
+				properties => {
+					note => {
+						type => 'string',
+						description => 'A note about the user',
+					},
+					reason => {
+						type => 'string',
+						enum => ['spontaneous', 'requested'],
+						description => 'Use "requested" if user asked you to remember',
+					},
+				},
+			},
+		},
+		runner => sub ($self, $channel, $user, $input) {
+			$self->user_notes->store($input->{note}, aspect => $user);
+			return 'saved';
+		},
+	},
+	save_bot_note => {
+		definition => {
+			name => 'save_bot_note',
+			description  => q{Save a note about yourself for later.},
+			input_schema => {
+				type => 'object',
+				required => ['note', 'reason'],
+				properties => {
+					note => {
+						type => 'string',
+						description => 'A note about you',
+					},
+					reason => {
+						type => 'string',
+						enum => ['spontaneous', 'requested'],
+						description => 'Use "requested" if user asked you to remember',
+					},
+				},
+			},
+		},
+		runner => sub ($self, $channel, $user, $input) {
+			$self->self_notes->store($input->{note});
+			return 'saved';
 		},
 	},
 );

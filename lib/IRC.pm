@@ -4,7 +4,7 @@ use v5.40;
 
 use Moo;
 use Mooish::AttributeBuilder;
-use Types::Standard -types;
+use Types::Common -types;
 use Mojo::IRC;
 use Mojo::IOLoop;
 use Encode qw(encode decode);

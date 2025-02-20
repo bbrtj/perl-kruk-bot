@@ -16,6 +16,7 @@ my $awaiting_response = !!0;
 Mojo::IOLoop->recurring(1 => sub {
 	return if $awaiting_response;
 
+	print "> ";
 	my $msg = readline STDIN;
 	chomp $msg;
 
