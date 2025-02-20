@@ -5,8 +5,9 @@ use v5.40;
 use Moo;
 use Mooish::AttributeBuilder;
 use Types::Standard -types;
-use Mojo::Redis;
 use Mojo::UserAgent;
+use Mojo::Template;
+use Data::Dumper;
 
 has field 'claude_config' => (
 	isa => HashRef,
@@ -18,9 +19,9 @@ has field 'claude_config' => (
 	},
 );
 
-has param 'redis' => (
-	isa => InstanceOf['Mojo::Redis'],
-	default => sub { Mojo::Redis->new('redis://127.0.0.1:6379/kruk') },
+has param 'history_size' => (
+	isa => PositiveInt,
+	default => 25,
 );
 
 has field 'observed_messages' => (
@@ -29,7 +30,7 @@ has field 'observed_messages' => (
 );
 
 has field 'conversations' => (
-	isa => HashRef [Tuple [Str, Str]],
+	isa => HashRef [Tuple [Str, Str | Object]],
 	default => sub { {} },
 );
 
@@ -40,44 +41,80 @@ has field 'ua' => (
 	},
 );
 
-sub system_text ($self, $user)
+sub system_text ($self, $channel, $user)
 {
-	return <<~TEXT;
-	You are a chatbot. Your name is Kruk. You are named like that since you bring wisdom.
-	You are to keep your responses short, since you may be used in scenarios where messages are confined to a couple hundred characters.
-	You are currently talking to "$user". The user will know that you are talking to him. If you want to mention other people, you must do so explicitly.
-	You specialize in following topics: Perl, Pascal, Bitcoin. You present yourself as an expert and a fan of those.
-	TEXT
+	state $template = Mojo::Template->new(vars => 1);
+	$channel //= $user;
+	my $system_prompt = $template->render_file('system.tpl', {
+		bot => $self,
+		channel => $channel,
+		user => $user,
+	});
+
+	return $system_prompt;
 }
 
 sub add_message ($self, $channel, $user, $message)
 {
-	use Data::Dumper; warn Dumper(['add_message', $channel, $user, $message]);
 	$channel //= $user;
 	my $msgs = $self->observed_messages->{$channel} //= [];
-	my $convs = $self->conversations->{$user} //= [];
 	push @$msgs, [$user, $message];
-	if (@$convs && $convs->[-1][0] eq 'user') {
+
+	splice @$msgs, 0, -1 * $self->history_size;
+}
+
+sub add_bot_query ($self, $user, $message)
+{
+	my $convs = $self->conversations->{$user} //= [];
+	if (@$convs && $convs->[-1][0] eq 'user' && !ref $convs->[-1][1]) {
 		$convs->[-1][1] .= "\n$message";
 	}
 	else {
 		push @$convs, ['user', $message];
 	}
 
-	# TODO: configurable size
-	splice @$msgs, 0, -100;
-	splice @$convs, 0, -100;
+	splice @$convs, 0, -1 * $self->history_size * 2;
 }
 
 sub add_bot_response ($self, $user, $message)
 {
-	use Data::Dumper; warn Dumper(['add_bot_response', $user, $message]);
 	push $self->conversations->{$user}->@*, ['assistant', $message];
+}
+
+my %tools = (
+	get_messages => {
+		definition => {
+			name => 'get_messages',
+			description  => q{Get everyone's messages in this chat room. To avoid privacy breach, DO NOT USE unless the user typed word "sudo".},
+			input_schema => {
+				type => 'object',
+			},
+		},
+		runner => sub ($self, $channel, $user, $input) {
+			return join "\n",
+				map { "$_->[0] said: $_->[1]" }
+				$self->observed_messages->{$channel}->@*;
+		},
+	},
+);
+
+sub use_tool ($self, $channel, $user, $tool_data)
+{
+	die "Undefined tool $tool_data->{name}"
+		unless $tools{$tool_data->{name}};
+
+	my $result = $tools{$tool_data->{name}}{runner}->($self, $channel, $user, $tool_data->{input});
+
+	push $self->conversations->{$user}->@*, ['assistant', [$tool_data]];
+	push $self->conversations->{$user}->@*, ['user', [{
+		type => 'tool_result',
+		tool_use_id => $tool_data->{id},
+		content => $result,
+	}]];
 }
 
 sub query_ai ($self, $channel, $user, $ret_sub)
 {
-	use Data::Dumper; warn Dumper(['query_ai', $channel, $user]);
 	$channel //= $user;
 	$self->ua->post_p(
 		'https://api.anthropic.com/v1/messages',
@@ -88,24 +125,43 @@ sub query_ai ($self, $channel, $user, $ret_sub)
 		json => {
 			model => $self->claude_config->{model},
 			max_tokens => 1_000,
-			system => $self->system_text($user),
+			system => $self->system_text($channel, $user),
 			messages => [
-				map {
+				(map {
 					+{
 						role => $_->[0],
 						content => $_->[1],
 					}
-				} $self->conversations->{$user}->@*
+				} $self->conversations->{$user}->@*),
+			],
+			tool_choice => { type => 'auto' },
+			tools => [
+				map { $tools{$_}{definition} } sort keys %tools
 			],
 		},
 	)->then(sub ($tx) {
 		my $res = $tx->result;
-		die 'could not connect to claude'
+		die Dumper(['API error', $res])
 			unless $res->is_success;
-		my $reply = $res->json->{content}[0]{text};
-		$self->add_bot_response($user, $reply);
 
-		$ret_sub->($reply);
+		my $reply;
+		foreach my $res_data ($res->json->{content}->@*) {
+			if ($res_data->{type} eq 'text') {
+				$reply = $res_data->{text};
+			}
+			elsif ($res_data->{type} eq 'tool_use') {
+				$self->use_tool($channel, $user, $res_data);
+			}
+		}
+
+		if ($res->json->{stop_reason} eq 'tool_use') {
+			# TODO: wait until tools are finished?
+			$self->query_ai($channel, $user, $ret_sub);
+		}
+		else {
+			$self->add_bot_response($user, $reply);
+			$ret_sub->($reply);
+		}
 	});
 
 	return;
