@@ -11,6 +11,7 @@ use Data::Dumper;
 use List::Util qw(none);
 
 use Bot::Notes;
+use all 'Bot::AITool';
 
 has field 'claude_config' => (
 	isa => HashRef,
@@ -49,6 +50,11 @@ has field 'conversations' => (
 	default => sub { {} },
 );
 
+has field 'tools' => (
+	isa => HashRef [InstanceOf ['Bot::AITool']],
+	default => sub { {} },
+);
+
 has field 'self_notes' => (
 	isa => InstanceOf ['Bot::Notes'],
 	default => sub {
@@ -69,6 +75,15 @@ has field 'ua' => (
 		Mojo::UserAgent->new;
 	},
 );
+
+sub BUILD ($self, @)
+{
+	$self->tools->%* = (
+		Bot::AITool::ReadChat->register($self),
+		Bot::AITool::SaveSelfNote->register($self),
+		Bot::AITool::SaveUserNote->register($self),
+	);
+}
 
 sub system_text ($self, $channel, $user)
 {
@@ -110,79 +125,12 @@ sub add_bot_response ($self, $user, $message)
 	push $self->conversations->{$user}->@*, ['assistant', $message];
 }
 
-my %tools = (
-	get_messages => {
-		definition => {
-			name => 'get_messages',
-			description  => q{Get everyone's messages in this chat room. To avoid privacy breach, DO NOT USE unless the user typed word "sudo".},
-			input_schema => {
-				type => 'object',
-			},
-		},
-		runner => sub ($self, $channel, $user, $input) {
-			return join "\n",
-				map { "$_->[0] said: $_->[1]" }
-				$self->observed_messages->{$channel}->@*;
-		},
-	},
-	save_user_note => {
-		definition => {
-			name => 'save_user_note',
-			description  => q{Save a note about the user for later. Don't wait for user to tell you to remember something, use it if they share something that may help with conversation.},
-			input_schema => {
-				type => 'object',
-				required => ['note', 'reason'],
-				properties => {
-					note => {
-						type => 'string',
-						description => 'A note about the user',
-					},
-					reason => {
-						type => 'string',
-						enum => ['spontaneous', 'requested'],
-						description => 'Use "requested" if user asked you to remember',
-					},
-				},
-			},
-		},
-		runner => sub ($self, $channel, $user, $input) {
-			$self->user_notes->store($input->{note}, aspect => $user);
-			return 'saved';
-		},
-	},
-	save_bot_note => {
-		definition => {
-			name => 'save_bot_note',
-			description  => q{Save a note about yourself for later (global for all users). Only save important information.},
-			input_schema => {
-				type => 'object',
-				required => ['note', 'reason'],
-				properties => {
-					note => {
-						type => 'string',
-						description => 'A note about you',
-					},
-					reason => {
-						type => 'string',
-						enum => ['spontaneous', 'requested'],
-						description => 'Use "requested" if user asked you to remember',
-					},
-				},
-			},
-		},
-		runner => sub ($self, $channel, $user, $input) {
-			$self->self_notes->store($input->{note});
-			return 'saved';
-		},
-	},
-);
-
 sub use_tool ($self, $channel, $user, $tool_data)
 {
 	die "Undefined tool $tool_data->{name}"
-		unless $tools{$tool_data->{name}};
+		unless $self->tools->{$tool_data->{name}};
 
-	my $result = $tools{$tool_data->{name}}{runner}->($self, $channel, $user, $tool_data->{input});
+	my $result = $self->tools->{$tool_data->{name}}->runner($channel, $user, $tool_data->{input});
 
 	push $self->conversations->{$user}->@*, ['assistant', [$tool_data]];
 	push $self->conversations->{$user}->@*, ['user', [{
@@ -278,7 +226,7 @@ sub query_bot ($self, $channel, $user, $ret_sub)
 			],
 			tool_choice => { type => 'auto' },
 			tools => [
-				map { $tools{$_}{definition} } sort keys %tools
+				map { $_->definition } grep { $_->available } values $self->tools->%*
 			],
 		},
 	)->then(sub ($tx) {

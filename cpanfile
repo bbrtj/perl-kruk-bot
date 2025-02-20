@@ -9,6 +9,7 @@ requires 'Mojo::IRC';
 requires 'IO::Socket::SSL';
 
 requires 'Tie::Storable';
+requires 'all';
 
 # vim: ft=perl
 

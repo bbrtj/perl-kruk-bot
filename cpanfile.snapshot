@@ -391,3 +391,11 @@ DISTRIBUTIONS
       Test::More 0.47
       XSLoader 0
       perl 5.008001
+  all-0.5101
+    pathname: D/DE/DEXTER/all-0.5101.tar.gz
+    provides:
+      all 0.5101
+    requirements:
+      File::Find 0
+      File::Spec 0
+      perl 5.006
