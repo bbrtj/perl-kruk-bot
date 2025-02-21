@@ -2,9 +2,7 @@ package Bot::Notes;
 
 use v5.40;
 
-use Moo;
-use Mooish::AttributeBuilder;
-use Types::Common -types;
+use Mooish::Base;
 use Tie::Storable;
 
 has param 'context' => (

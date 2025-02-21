@@ -2,9 +2,7 @@ package Bot::AITool::ReadChat;
 
 use v5.40;
 
-use Moo;
-use Mooish::AttributeBuilder;
-use Types::Common -types;
+use Mooish::Base;
 
 extends 'Bot::AITool';
 

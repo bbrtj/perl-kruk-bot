@@ -2,9 +2,7 @@ package Bot;
 
 use v5.40;
 
-use Moo;
-use Mooish::AttributeBuilder;
-use Types::Common -types;
+use Mooish::Base;
 use Mojo::UserAgent;
 use Mojo::Template;
 use Data::Dumper;

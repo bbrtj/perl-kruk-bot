@@ -2,9 +2,7 @@ package IRC;
 
 use v5.40;
 
-use Moo;
-use Mooish::AttributeBuilder;
-use Types::Common -types;
+use Mooish::Base;
 use Mojo::IRC;
 use Mojo::IOLoop;
 use List::Util qw(any);
