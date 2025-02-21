@@ -4,11 +4,11 @@ use lib 'lib';
 use Env::Dot;
 use Bot;
 use Bot::Context;
-use IRC;
+use Bot::IRC;
 use Data::Dumper;
 
 my $bot = Bot->new;
-my $irc = IRC->new;
+my $irc = Bot::IRC->new;
 my @ctxs;
 
 $irc->configure(sub ($msg) {

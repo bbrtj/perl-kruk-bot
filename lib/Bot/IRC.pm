@@ -1,4 +1,4 @@
-package IRC;
+package Bot::IRC;
 
 use v5.40;
 
