@@ -9,6 +9,7 @@ use Data::Dumper;
 
 use Bot::Notes;
 use all 'Bot::AITool';
+use all 'Bot::Command';
 
 has field 'claude_config' => (
 	isa => HashRef,
@@ -49,7 +50,23 @@ has field 'conversations' => (
 
 has field 'tools' => (
 	isa => HashRef [InstanceOf ['Bot::AITool']],
-	default => sub { {} },
+	default => sub ($self) {
+		return {
+			Bot::AITool::ReadChat->register($self),
+			Bot::AITool::SaveSelfNote->register($self),
+			Bot::AITool::SaveUserNote->register($self),
+		}
+	},
+);
+
+has field 'commands' => (
+	isa => HashRef [InstanceOf ['Bot::Command']],
+	default => sub ($self) {
+		return {
+			Bot::Command::MyNotes->register($self),
+			Bot::Command::Notes->register($self),
+		}
+	},
 );
 
 has field 'self_notes' => (
@@ -72,15 +89,6 @@ has field 'ua' => (
 		Mojo::UserAgent->new;
 	},
 );
-
-sub BUILD ($self, @)
-{
-	$self->tools->%* = (
-		Bot::AITool::ReadChat->register($self),
-		Bot::AITool::SaveSelfNote->register($self),
-		Bot::AITool::SaveUserNote->register($self),
-	);
-}
 
 sub system_text ($self, $ctx)
 {
@@ -137,50 +145,20 @@ sub use_tool ($self, $ctx, $tool_data)
 	}]];
 }
 
-my %commands = (
-	'/usernotes' => {
-		syntax => '/usernotes (remove <n>)',
-		runner => sub ($self, $ctx, @args) {
-			if (!$args[0]) {
-				return "Here are my notes about you:\n" . $self->user_notes->dump(aspect => $ctx->user, ordered => !!1);
-			}
-			elsif (@args == 2 && $args[0] eq 'remove' && PositiveOrZeroInt->check($args[1])) {
-				$self->user_notes->remove(aspect => $ctx->user, index => $args[1]);
-				return 'Note about you removed.';
-			}
-
-			die 'bad command arguments';
-		},
-	},
-	'/selfnotes' => {
-		syntax => '/selfnotes (remove <n>)',
-		runner => sub ($self, $ctx, @args) {
-			if (!$args[0]) {
-				return "Here is my diary:\n" . $self->self_notes->dump(ordered => !!1);
-			}
-			elsif (@args == 2 && $args[0] eq 'remove' && PositiveOrZeroInt->check($args[1])) {
-				$self->self_notes->remove(index => $args[1]);
-				return 'Diary entry removed.';
-			}
-
-			die 'bad command arguments';
-		},
-	},
-);
-
 sub handle_command ($self, $ctx)
 {
-	if ($ctx->message =~ m{^\s*(/\w+)(?: (.+))?$}) {
+	my $prefix = quotemeta Bot::Command->prefix;
+	if ($ctx->message =~ m{^\s*$prefix(\w+)(?: (.+))?$}) {
 		my $command = $1;
 		my @args = split /\s+/, $2 // '';
 
-		if ($commands{$command}) {
+		if ($self->commands->{$command}) {
 			try {
-				$ctx->set_response($commands{$command}{runner}->($self, $ctx, @args));
+				$ctx->set_response($self->commands->{$command}->runner($ctx, @args));
 			}
 			catch ($e) {
 				say $e;
-				$ctx->set_response('Command error. Usage: ' . $commands{$command}{syntax});
+				$ctx->set_response('Command error. Usage: ' . $self->commands->{$command}->get_usage);
 			}
 		}
 		else {
