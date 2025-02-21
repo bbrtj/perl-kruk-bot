@@ -3,52 +3,53 @@ package Bot::Notes;
 use v5.40;
 
 use Mooish::Base;
-use Tie::Storable;
+use Bot::Schema::Note;
 
 has param 'context' => (
 	isa => Str,
 );
 
-has field 'storage' => (
-	isa => HashRef,
-	default => sub { {} },
-);
-
-sub _get_filename ($self)
-{
-	return sprintf 'notes.%s.storage', $self->context;
-}
-
-sub BUILD ($self, @)
-{
-	tie $self->storage->%*, 'Tie::Storable', $self->_get_filename
-		or die 'could not tie storage';
-}
-
 sub store ($self, $note, %args)
 {
-	push $self->storage->{$args{aspect} // 'none'}->@*, $note;
+	my $item = Bot::Schema::Note->new(
+		context => $args{aspect},
+		reason => $args{reason},
+		content => $note,
+	);
+
+	$item->prepare_and_save;
+	return $item->id;
 }
 
 sub retrieve ($self, %args)
 {
-	return $self->storage->{$args{aspect} // 'none'} // [];
+	return Bot::Schema::Note::Manager->get_notes(
+		query => [
+			context => $args{aspect}
+		]
+	);
 }
 
 sub remove ($self, %args)
 {
-	splice $self->storage->{$args{aspect} // 'none'}->@*, $args{index} // 0, 1;
-	return;
+	my $item = Bot::Schema::Note->new(
+		id => $args{id},
+		context => $args{aspect},
+	);
+
+	return $item->delete;
 }
 
 sub dump ($self, %args)
 {
 	my $notes = $self->retrieve(%args);
 	if (@$notes) {
-		my @note_texts = @$notes;
+		my @note_texts;
 		if ($args{ordered}) {
-			my $index = 0;
-			@note_texts = map { ($index++) . ": $_" } @note_texts;
+			@note_texts = map { $_->id . ": " . $_->content } @$notes;
+		}
+		else {
+			@note_texts = map { $_->content } @$notes;
 		}
 
 		return join "\n", grep { defined }

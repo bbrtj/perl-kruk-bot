@@ -6,8 +6,11 @@ requires 'Mooish::Base';
 requires 'Mojo::IRC';
 requires 'IO::Socket::SSL';
 
-requires 'Tie::Storable';
 requires 'all';
+
+requires 'Rose::DB::Object';
+requires 'DBD::Pg';
+requires 'DBD::SQLite';
 
 # vim: ft=perl
 

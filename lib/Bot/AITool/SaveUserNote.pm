@@ -33,7 +33,7 @@ sub _build_definition ($self)
 
 sub runner ($self, $ctx, $input)
 {
-	$self->bot_instance->user_notes->store($input->{note}, aspect => $ctx->user);
+	$self->bot_instance->user_notes->store($input->{note}, aspect => $ctx->user, reason => $input->{reason});
 	return 'saved';
 }
 
