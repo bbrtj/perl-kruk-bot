@@ -31,7 +31,7 @@ sub _build_definition ($self)
 	};
 }
 
-sub runner ($self, $channel, $user, $input)
+sub runner ($self, $ctx, $input)
 {
 	$self->self_notes->store($input->{note});
 	return 'saved';

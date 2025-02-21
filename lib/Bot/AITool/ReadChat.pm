@@ -19,10 +19,10 @@ sub _build_definition ($self)
 	};
 }
 
-sub runner ($self, $channel, $user, $input)
+sub runner ($self, $ctx, $input)
 {
 	return join "\n",
 		map { "$_->[0] said: $_->[1]" }
-		$self->bot_instance->observed_messages->{$channel}->@*;
+		$self->bot_instance->observed_messages->{$ctx->channel}->@*;
 }
 

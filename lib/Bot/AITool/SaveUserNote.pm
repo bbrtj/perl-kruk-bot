@@ -31,9 +31,9 @@ sub _build_definition ($self)
 	};
 }
 
-sub runner ($self, $channel, $user, $input)
+sub runner ($self, $ctx, $input)
 {
-	$self->bot_instance->user_notes->store($input->{note}, aspect => $user);
+	$self->bot_instance->user_notes->store($input->{note}, aspect => $ctx->user);
 	return 'saved';
 }
 

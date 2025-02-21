@@ -6,7 +6,6 @@ use Mooish::Base;
 use Mojo::UserAgent;
 use Mojo::Template;
 use Data::Dumper;
-use List::Util qw(none);
 
 use Bot::Notes;
 use all 'Bot::AITool';
@@ -83,55 +82,55 @@ sub BUILD ($self, @)
 	);
 }
 
-sub system_text ($self, $channel, $user)
+sub system_text ($self, $ctx)
 {
 	state $template = Mojo::Template->new(vars => 1);
-	$channel //= $user;
 	my $system_prompt = $template->render_file('system.tpl', {
 		bot => $self,
-		channel => $channel,
-		user => $user,
+		ctx => $ctx,
 	});
 
 	return $system_prompt;
 }
 
-sub add_message ($self, $channel, $user, $message)
+sub add_message ($self, $ctx)
 {
-	$channel //= $user;
-	my $msgs = $self->observed_messages->{$channel} //= [];
-	push @$msgs, [$user, $message];
+	my $msgs = $self->observed_messages->{$ctx->channel_text} //= [];
+	push @$msgs, [$ctx->user, $ctx->message];
 
 	splice @$msgs, 0, -1 * $self->history_size;
 }
 
-sub add_bot_query ($self, $user, $message)
+sub add_bot_query ($self, $ctx)
 {
-	my $convs = $self->conversations->{$user} //= [];
-	if (@$convs && $convs->[-1][0] eq 'user' && !ref $convs->[-1][1]) {
-		$convs->[-1][1] .= "\n$message";
+	my $convs = $self->conversations->{$ctx->user} //= [];
+	if (@$convs && $convs->[-1][0] eq 'user') {
+		if (ref $convs->[-1][1] ne 'ARRAY') {
+			$convs->[-1][1] = [$convs->[-1][1]];
+		}
+		push $convs->[-1][1]->@*, $ctx->message;
 	}
 	else {
-		push @$convs, ['user', $message];
+		push @$convs, ['user', $ctx->message];
 	}
 
 	splice @$convs, 0, -1 * $self->history_size * 2;
 }
 
-sub add_bot_response ($self, $user, $message)
+sub add_bot_response ($self, $ctx)
 {
-	push $self->conversations->{$user}->@*, ['assistant', $message];
+	push $self->conversations->{$ctx->user}->@*, ['assistant', $ctx->response];
 }
 
-sub use_tool ($self, $channel, $user, $tool_data)
+sub use_tool ($self, $ctx, $tool_data)
 {
 	die "Undefined tool $tool_data->{name}"
 		unless $self->tools->{$tool_data->{name}};
 
-	my $result = $self->tools->{$tool_data->{name}}->runner($channel, $user, $tool_data->{input});
+	my $result = $self->tools->{$tool_data->{name}}->runner($ctx, $tool_data->{input});
 
-	push $self->conversations->{$user}->@*, ['assistant', [$tool_data]];
-	push $self->conversations->{$user}->@*, ['user', [{
+	push $self->conversations->{$ctx->user}->@*, ['assistant', [$tool_data]];
+	push $self->conversations->{$ctx->user}->@*, ['user', [{
 		type => 'tool_result',
 		tool_use_id => $tool_data->{id},
 		content => $result,
@@ -141,12 +140,12 @@ sub use_tool ($self, $channel, $user, $tool_data)
 my %commands = (
 	'/usernotes' => {
 		syntax => '/usernotes (remove <n>)',
-		runner => sub ($self, $channel, $user, @args) {
+		runner => sub ($self, $ctx, @args) {
 			if (!$args[0]) {
-				return "Here are my notes about you:\n" . $self->user_notes->dump(aspect => $user, ordered => !!1);
+				return "Here are my notes about you:\n" . $self->user_notes->dump(aspect => $ctx->user, ordered => !!1);
 			}
 			elsif (@args == 2 && $args[0] eq 'remove' && PositiveOrZeroInt->check($args[1])) {
-				$self->user_notes->remove(aspect => $user, index => $args[1]);
+				$self->user_notes->remove(aspect => $ctx->user, index => $args[1]);
 				return 'Note about you removed.';
 			}
 
@@ -155,7 +154,7 @@ my %commands = (
 	},
 	'/selfnotes' => {
 		syntax => '/selfnotes (remove <n>)',
-		runner => sub ($self, $channel, $user, @args) {
+		runner => sub ($self, $ctx, @args) {
 			if (!$args[0]) {
 				return "Here is my diary:\n" . $self->self_notes->dump(ordered => !!1);
 			}
@@ -169,23 +168,23 @@ my %commands = (
 	},
 );
 
-sub handle_command ($self, $channel, $user, $message, $ret_sub)
+sub handle_command ($self, $ctx)
 {
-	if ($message =~ m{^\s*(/\w+)(?: (.+))?$}) {
+	if ($ctx->message =~ m{^\s*(/\w+)(?: (.+))?$}) {
 		my $command = $1;
 		my @args = split /\s+/, $2 // '';
 
 		if ($commands{$command}) {
 			try {
-				$ret_sub->($commands{$command}{runner}->($self, $channel, $user, @args));
+				$ctx->set_response($commands{$command}{runner}->($self, $ctx, @args));
 			}
 			catch ($e) {
 				say $e;
-				$ret_sub->('Command error. Usage: ' . $commands{$command}{syntax});
+				$ctx->set_response('Command error. Usage: ' . $commands{$command}{syntax});
 			}
 		}
 		else {
-			$ret_sub->('Unknown command');
+			$ctx->set_response('Unknown command');
 		}
 
 		return !!1;
@@ -194,13 +193,12 @@ sub handle_command ($self, $channel, $user, $message, $ret_sub)
 	return !!0;
 }
 
-sub query_bot ($self, $channel, $user, $ret_sub)
+sub query_bot ($self, $ctx)
 {
-	$channel //= $user;
-
-	if ($channel eq $user && none { fc $user eq fc } $self->trusted_users->@*) {
+	if (!$ctx->has_channel && !$ctx->user_of($self->trusted_users)) {
+		my $user = $ctx->user;
 		my $owner = $self->owner;
-		$ret_sub->(qq{I'm sorry, but your name "$user" is not allowed to use my AI in private chat. Ask "$owner" to add you to trusted users});
+		$ctx->set_response(qq{I'm sorry, but your name "$user" is not allowed to use my AI in a private chat. Ask "$owner" to add you to trusted users.});
 		return;
 	}
 
@@ -213,14 +211,14 @@ sub query_bot ($self, $channel, $user, $ret_sub)
 		json => {
 			model => $self->claude_config->{model},
 			max_tokens => 1_000,
-			system => $self->system_text($channel, $user),
+			system => $self->system_text($ctx),
 			messages => [
 				(map {
 					+{
 						role => $_->[0],
 						content => $_->[1],
 					}
-				} $self->conversations->{$user}->@*),
+				} $self->conversations->{$ctx->user}->@*),
 			],
 			tool_choice => { type => 'auto' },
 			tools => [
@@ -238,17 +236,17 @@ sub query_bot ($self, $channel, $user, $ret_sub)
 				$reply = $res_data->{text};
 			}
 			elsif ($res_data->{type} eq 'tool_use') {
-				$self->use_tool($channel, $user, $res_data);
+				$self->use_tool($ctx, $res_data);
 			}
 		}
 
 		if ($res->json->{stop_reason} eq 'tool_use') {
 			# TODO: wait until tools are finished?
-			$self->query_bot($channel, $user, $ret_sub);
+			$self->query_bot($ctx);
 		}
 		else {
-			$self->add_bot_response($user, $reply);
-			$ret_sub->($reply);
+			$ctx->set_response($reply);
+			$self->add_bot_response($ctx);
 		}
 	});
 

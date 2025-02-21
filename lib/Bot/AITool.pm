@@ -24,7 +24,7 @@ sub _build_definition ($self)
 	...
 }
 
-sub runner ($self, $channel, $user, $input)
+sub runner ($self, $ctx, $input)
 {
 	...
 }

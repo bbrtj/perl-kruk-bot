@@ -58,9 +58,11 @@ sub dispatch ($self, $msg)
 	};
 }
 
-sub speak ($self, $channel, $user, $msg)
+sub speak ($self, $ctx)
 {
-	my $is_private = !defined $channel;
+	my $msg = $ctx->response;
+	my $user = $ctx->user;
+
 	$msg =~ s{(```.*?```)}{(UNIMPLEMENTED)}sg;
 	#my @snippets;
 	#$reply =~ s|(```.*?```)|my $doc_id = random_string(17); push @snippets, [$doc_id, $1]; "[ $base_url/$doc_id ]"|seg;
@@ -79,7 +81,7 @@ sub speak ($self, $channel, $user, $msg)
 	$msg =~ s/\s{2,}|\n/ /g; # reduce to one line
 	$msg = trim $msg;
 	my $reply_utf8 = encode 'UTF-8', $msg;
-	my $max_line_length = 430 - ($is_private ? 1 : length(encode 'UTF-8', ":$user: "));
+	my $max_line_length = 430 - (!$ctx->has_channel ? 1 : length(encode 'UTF-8', ":$user: "));
 	while (length $reply_utf8) {
 		my $num = $max_line_length - 1;
 		$reply_utf8 =~ s/^(.{,$num}\S)(?:\s|\z)//;
@@ -88,11 +90,11 @@ sub speak ($self, $channel, $user, $msg)
 	}
 
 	my $irc = $self->irc_instance;
-	if ($is_private) {
-		$irc->write(privmsg => $user, ":$_") foreach @lines;
+	if ($ctx->has_channel) {
+		$irc->write(privmsg => $ctx->channel, ":$user: $_") foreach splice @lines, 0, 5;
+		$irc->write(privmsg => $ctx->channel, ":$user: [response was truncated]") if @lines;
 	} else {
-		$irc->write(privmsg => $channel, ":$user: $_") foreach splice @lines, 0, 5;
-		$irc->write(privmsg => $channel, ":$user: [response was truncated]") if @lines;
+		$irc->write(privmsg => $user, ":$_") foreach @lines;
 	}
 }
 
