@@ -21,7 +21,7 @@ sub _build_definition ($self)
 
 sub runner ($self, $ctx, $input)
 {
-	return join "\n",
+	return "Chat log:\n" . join "\n",
 		map { "$_->[0] said: $_->[1]" }
 		$self->bot_instance->observed_messages->{$ctx->channel}->@*;
 }
