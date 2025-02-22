@@ -10,7 +10,7 @@ use Bot::Context;
 use Bot::IRC;
 use Data::Dumper;
 
-my $bot = Bot->new;
+my $bot = Bot->new(environment => 'irc');
 my $irc = Bot::IRC->new;
 my @ctxs;
 

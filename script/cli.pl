@@ -13,7 +13,7 @@ use Bot::Context;
 binmode STDOUT, ':encoding(UTF-8)';
 binmode STDIN, ':encoding(UTF-8)';
 
-my $bot = Bot->new;
+my $bot = Bot->new(environment => 'cli');
 my $user = $bot->owner;
 my $ctx;
 my $awaiting_input = !!0;

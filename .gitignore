@@ -1,7 +1,7 @@
 .tidyall.d
 .env
 .carmel
-system.*.ep
+prompts/system.*.ep
 local
 *.db
 

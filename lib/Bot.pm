@@ -11,6 +11,10 @@ use Bot::Notes;
 use all 'Bot::AITool';
 use all 'Bot::Command';
 
+has param 'environment' => (
+	isa => SimpleStr,
+);
+
 has param 'personality' => (
 	isa => SimpleStr,
 	default => 'default',
@@ -22,6 +26,7 @@ has field 'claude_config' => (
 		return {
 			api_key => $ENV{KRUK_CLAUDE_API_KEY},
 			model => $ENV{KRUK_CLAUDE_MODEL},
+			cache_length => $ENV{KRUK_CLAUDE_CACHE_LENGTH},
 		};
 	},
 );
@@ -88,18 +93,41 @@ has field 'ua' => (
 	},
 );
 
-sub system_text ($self, $ctx)
+sub system_prompts ($self, $ctx)
 {
 	state $template = Mojo::Template->new(vars => 1);
-	my $personality = $self->personality;
-	my $system_prompt = $template->render_file(
-		"system.$personality.ep", {
+	my @prompts;
+
+	push @prompts, $template->render_file(
+		"prompts/system.@{[$self->personality]}.ep", {
 			bot => $self,
 			ctx => $ctx,
 		}
 	);
 
-	return $system_prompt;
+	try {
+		push @prompts, $template->render_file(
+			"prompts/environment.@{[$self->environment]}.ep", {
+				bot => $self,
+				ctx => $ctx,
+			}
+		);
+	}
+	catch ($e) {
+		die $e if $e !~ /no such file or directory/i;
+	}
+
+	push @prompts, grep { length }
+		$self->notes->dump(prefix => 'Here is your diary:'),
+		$self->notes->dump(aspect => $ctx->user, prefix => 'Here are your notes about the user:');
+
+	@prompts = map { +{type => 'text', text => $_} } @prompts;
+	foreach my $prompt (@prompts) {
+		$prompt->{cache_control} = {type => 'ephemeral'}
+			if length $prompt->{text} > $self->claude_config->{cache_length};
+	}
+
+	return \@prompts;
 }
 
 sub add_message ($self, $ctx)
@@ -196,7 +224,7 @@ sub query_bot ($self, $ctx)
 		json => {
 			model => $self->claude_config->{model},
 			max_tokens => 1_000,
-			system => $self->system_text($ctx),
+			system => $self->system_prompts($ctx),
 			messages => [
 				(
 					map {
