@@ -1,0 +1,10 @@
+% layout 'default', title => 'Snippets';
+
+<p><pre><code><%= $item->snippet %></code></pre></p>
+<p>Language: <%= $item->syntax %></p>
+<p>Expires: <%= $expiration->cdate %></p>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
+

@@ -10,5 +10,7 @@ CREATE TABLE notes(
 	created_at INTEGER NOT NULL
 );
 
+CREATE INDEX ind_notes_lookup ON notes (context, reason);
+
 COMMIT;
 

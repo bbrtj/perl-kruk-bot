@@ -28,6 +28,17 @@ DISTRIBUTIONS
       Carp::Clan 5.3
       ExtUtils::MakeMaker 0
       Storable 2.21
+  Bytes-Random-Secure-Tiny-1.011
+    pathname: D/DA/DAVIDO/Bytes-Random-Secure-Tiny-1.011.tar.gz
+    provides:
+      Bytes::Random::Secure::Tiny 1.011
+      Crypt::Random::Seed::Embedded 1.011
+      Math::Random::ISAAC::Embedded 1.011
+      Math::Random::ISAAC::PP::Embedded 1.011
+    requirements:
+      ExtUtils::MakeMaker 6.56
+      Test::More 0.98
+      perl 5.008000
   Carp-Clan-6.08
     pathname: E/ET/ETHER/Carp-Clan-6.08.tar.gz
     provides:
@@ -260,6 +271,14 @@ DISTRIBUTIONS
       perl 5.012
       strict 0
       warnings 0
+  Data-ULID-1.3
+    pathname: B/BA/BALDUR/Data-ULID-1.3.tar.gz
+    provides:
+      Data::ULID 1.3
+    requirements:
+      Bytes::Random::Secure::Tiny 0
+      ExtUtils::MakeMaker 0
+      Time::HiRes 0
   DateTime-1.65
     pathname: D/DR/DROLSKY/DateTime-1.65.tar.gz
     provides:

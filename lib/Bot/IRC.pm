@@ -4,9 +4,10 @@ use v5.40;
 
 use Mooish::Base;
 use Mojo::IRC;
-use Mojo::IOLoop;
 use List::Util qw(any);
 use Encode qw(encode decode);
+use Bot::Schema::Snippet;
+use Web;
 
 has field 'config' => (
 	isa => HashRef,
@@ -30,6 +31,16 @@ has field 'irc_instance' => (
 			# tls => {},
 		);
 	},
+);
+
+has field 'web_instance' => (
+	isa => InstanceOf ['Web'],
+	default => sub { Web->new },
+);
+
+has field 'snippet_lifetime' => (
+	isa => PositiveInt,
+	default => sub { $ENV{KRUK_SNIPPET_LIFETIME} * 60 },
 );
 
 sub dispatch ($self, $msg)
@@ -58,24 +69,26 @@ sub dispatch ($self, $msg)
 	};
 }
 
+sub save_snippet ($self, $snippet)
+{
+	(my $type, $snippet) = split /\v/, $snippet, 2;
+	$type = undef unless length $type;
+
+	my $item = Bot::Schema::Snippet->new(
+		syntax => $type,
+		snippet => $snippet,
+	);
+
+	$item->prepare_and_save;
+	return $self->web_instance->url_for(snippet => {snippet_id => $item->id});
+}
+
 sub speak ($self, $ctx)
 {
 	my $msg = $ctx->response;
 	my $user = $ctx->user;
 
-	$msg =~ s{(```.*?```)}{(UNIMPLEMENTED)}sg;
-	#my @snippets;
-	#$reply =~ s|(```.*?```)|my $doc_id = random_string(17); push @snippets, [$doc_id, $1]; "[ $base_url/$doc_id ]"|seg;
-	#if (@snippets) {
-	#	my $redis_db = $redis->db;
-	#	my $p = Mojo::Promise->all(
-	#		map {
-	#			my ($doc_id, $doc) = @$_;
-	#			$redis_db->set_p($doc_id, $doc, 'EX', $snippet_duration);
-	#		} @snippets,
-	#	);
-	#	await $p;
-	#}
+	$msg =~ s{```(.*?)```}{'[ ' . $self->save_snippet($1) . ' ]'}seg;
 
 	my @lines;
 	$msg =~ s/\s{2,}|\n/ /g; # reduce to one line
@@ -124,6 +137,20 @@ sub configure ($self, $react_sub)
 		return if !$msg_data;
 
 		$react_sub->($msg_data);
+	});
+
+	$irc->ioloop->recurring(60 => sub {
+		my $threshold = time - $self->snippet_lifetime;
+
+		my $expired = Bot::Schema::Snippet::Manager->get_snippets(
+			query => [
+				created_at => { lt => $threshold },
+			],
+		);
+
+		foreach my $item (@$expired) {
+			$item->delete;
+		}
 	});
 }
 

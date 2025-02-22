@@ -7,6 +7,7 @@ requires 'Mojo::IRC';
 requires 'IO::Socket::SSL';
 
 requires 'all';
+requires 'Data::ULID';
 
 requires 'Rose::DB::Object';
 requires 'DBD::Pg';
