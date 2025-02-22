@@ -13,17 +13,17 @@ my @ctxs;
 
 $irc->configure(sub ($msg) {
 	my $ctx = Bot::Context->new($msg);
-	push @ctxs, $ctx;
 
 	my sub respond ($response) {
 		$ctx->set_response($response);
 	}
 
-	return if $bot->handle_command($ctx);
-
 	$bot->add_message($ctx);
 
 	if ($msg->{for_me}) {
+		push @ctxs, $ctx;
+		return if $bot->handle_command($ctx);
+
 		$bot->add_bot_query($ctx);
 		$bot->query_bot($ctx);
 	}
