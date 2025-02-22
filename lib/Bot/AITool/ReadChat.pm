@@ -26,3 +26,8 @@ sub runner ($self, $ctx, $input)
 		$self->bot_instance->observed_messages->{$ctx->channel}->@*;
 }
 
+sub available ($self, $ctx)
+{
+	return $ctx->has_channel && scalar $ctx->message =~ /sudo/i;
+}
+

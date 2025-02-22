@@ -200,7 +200,7 @@ sub query_bot ($self, $ctx)
 			],
 			tool_choice => { type => 'auto' },
 			tools => [
-				map { $_->definition } grep { $_->available } values $self->tools->%*
+				map { $_->definition } grep { $_->available($ctx) } values $self->tools->%*
 			],
 		},
 	)->then(sub ($tx) {

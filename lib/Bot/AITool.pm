@@ -29,7 +29,7 @@ sub runner ($self, $ctx, $input)
 	...
 }
 
-sub available ($self)
+sub available ($self, $ctx)
 {
 	return !!1;
 }
