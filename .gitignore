@@ -1,5 +1,6 @@
 .env
 .carmel
 system.tpl
+local
 *.db
 
