@@ -9,7 +9,9 @@ use Encode qw(encode decode);
 use Bot::Schema::Snippet;
 use Web;
 
-has field 'config' => (
+use constant MAX_IRC_MESSAGE_LENGTH => 430;
+
+has param 'config' => (
 	isa => HashRef,
 	default => sub {
 		+{
@@ -40,7 +42,7 @@ has field 'web_instance' => (
 
 has field 'snippet_lifetime' => (
 	isa => PositiveInt,
-	default => sub { $ENV{KRUK_SNIPPET_LIFETIME} * 60 },
+	default => sub { ($ENV{KRUK_SNIPPET_LIFETIME} // 1440) * 60 },
 );
 
 sub dispatch ($self, $msg)
@@ -71,8 +73,10 @@ sub dispatch ($self, $msg)
 
 sub save_snippet ($self, $snippet)
 {
-	(my $type, $snippet) = split /\v/, $snippet, 2;
-	$type = undef unless length $type;
+	my $type;
+	if ($snippet =~ s{^(\w+)\v}{}) {
+		$type = $1;
+	}
 
 	my $item = Bot::Schema::Snippet->new(
 		syntax => $type,
@@ -83,24 +87,36 @@ sub save_snippet ($self, $snippet)
 	return $self->web_instance->url_for(snippet => {snippet_id => $item->id});
 }
 
+sub partition_text ($self, $text, $prefix)
+{
+	# reduce to one line with spaces
+	$text =~ s/[\s\v]/ /g;
+
+	# reduce multiple spaces
+	$text =~ s/\s+/ /g;
+
+	$text = trim $text;
+	my $max_line_length = MAX_IRC_MESSAGE_LENGTH - length(encode 'UTF-8', $prefix) - 1;
+	my @lines = (encode 'UTF-8', $text);
+
+	while (length $lines[-1] > $max_line_length) {
+		my $length = rindex $lines[-1], ' ', $max_line_length;
+		$length = $max_line_length if !$length;
+		splice @lines, -1, 0, substr $lines[-1], 0, $length, '';
+	}
+
+	return [map { trim decode 'UTF-8', $_ } @lines];
+}
+
 sub speak ($self, $ctx)
 {
 	my $msg = $ctx->response;
 	my $user = $ctx->user;
 
-	$msg =~ s{```(.*?)```}{'[ ' . $self->save_snippet($1) . ' ]'}seg;
+	my $prefix = $ctx->has_channel ? ":$user:" : ':';
 
-	my @lines;
-	$msg =~ s/\s{2,}|\n/ /g; # reduce to one line
-	$msg = trim $msg;
-	my $reply_utf8 = encode 'UTF-8', $msg;
-	my $max_line_length = 430 - (!$ctx->has_channel ? 1 : length(encode 'UTF-8', ":$user: "));
-	while (length $reply_utf8) {
-		my $num = $max_line_length - 1;
-		$reply_utf8 =~ s/^(.{,$num}\S)(?:\s|\z)//;
-		last if ! defined $1; # it's a bug if this ever happens
-		push @lines, decode 'UTF-8', trim($1);
-	}
+	$msg =~ s{```(.*?)```}{$self->save_snippet($1)}seg;
+	my @lines = $self->partition_text($msg, $prefix)->@*;
 
 	my $irc = $self->irc_instance;
 	if ($ctx->has_channel) {

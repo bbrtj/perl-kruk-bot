@@ -18,10 +18,3 @@ __PACKAGE__->register_db(
 	(lc $ENV{DB_ENGINE} eq 'sqlite' ? (sqlite_unicode => 1) : ()),
 );
 
-__PACKAGE__->register_db(
-	domain => 'test',
-	type => 'default',
-	driver => 'SQLite',
-	database => $ENV{TEST_DB},
-);
-

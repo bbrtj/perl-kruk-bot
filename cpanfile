@@ -13,5 +13,9 @@ requires 'Rose::DB::Object';
 requires 'DBD::Pg';
 requires 'DBD::SQLite';
 
+on test => sub {
+	requires 'Test2::V0';
+};
+
 # vim: ft=perl
 

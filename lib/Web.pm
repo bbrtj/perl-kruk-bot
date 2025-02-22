@@ -9,7 +9,7 @@ extends 'Mojolicious';
 
 has field 'base_url' => (
 	isa => Str,
-	default => sub { $ENV{MOJO_HOST} },
+	default => sub { $ENV{MOJO_HOST} // 'http://localhost:3000' },
 );
 
 sub startup ($self)
