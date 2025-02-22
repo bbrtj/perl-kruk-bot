@@ -1,3 +1,4 @@
+# HARNESS-CATEGORY-IMMISCIBLE
 use Test2::V0;
 use IPC::Open3;
 
