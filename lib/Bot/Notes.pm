@@ -5,10 +5,6 @@ use v5.40;
 use Mooish::Base;
 use Bot::Schema::Note;
 
-has param 'context' => (
-	isa => Str,
-);
-
 sub store ($self, $note, %args)
 {
 	my $item = Bot::Schema::Note->new(

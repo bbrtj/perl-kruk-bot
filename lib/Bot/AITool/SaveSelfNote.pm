@@ -13,14 +13,14 @@ sub _build_definition ($self)
 	return {
 		name => $self->name,
 		description =>
-			q{Save a note about yourself for later (global for all users). Only save important information.},
+			q{Save a note about yourself for later (global for all users). Only save important information - will serve as your diary for later.},
 		input_schema => {
 			type => 'object',
 			required => ['note', 'reason'],
 			properties => {
 				note => {
 					type => 'string',
-					description => 'A note about you',
+					description => 'A note about you, the chatbot',
 				},
 				reason => {
 					type => 'string',
@@ -34,7 +34,7 @@ sub _build_definition ($self)
 
 sub runner ($self, $ctx, $input)
 {
-	$self->bot_instance->self_notes->store($input->{note}, reason => $input->{reason});
+	$self->bot_instance->notes->store($input->{note}, reason => $input->{reason});
 	return 'saved';
 }
 

@@ -74,17 +74,10 @@ has field 'commands' => (
 	},
 );
 
-has field 'self_notes' => (
+has field 'notes' => (
 	isa => InstanceOf ['Bot::Notes'],
 	default => sub {
-		Bot::Notes->new(context => 'self');
-	},
-);
-
-has field 'user_notes' => (
-	isa => InstanceOf ['Bot::Notes'],
-	default => sub {
-		Bot::Notes->new(context => 'user');
+		Bot::Notes->new;
 	},
 );
 

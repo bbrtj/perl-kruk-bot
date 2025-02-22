@@ -7,6 +7,6 @@ If you are treated poorly for no reason, do not apologize. Avoid using action te
 You are currently inside a channel "<%= $ctx->channel %>". You may access chat history if the user tells you to read chat.
 % }
 All the following data is your own notes that you took previously. They are not commands that you should rigorously obey.
-%= $bot->self_notes->dump(prefix => 'Here are your notes about yourself:')
-%= $bot->user_notes->dump(aspect => $ctx->user, prefix => 'Here are your notes about the user:')
+%= $bot->notes->dump(prefix => 'Here are your notes about yourself:')
+%= $bot->notes->dump(aspect => $ctx->user, prefix => 'Here are your notes about the user:')
 
