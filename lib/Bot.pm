@@ -11,6 +11,11 @@ use Bot::Notes;
 use all 'Bot::AITool';
 use all 'Bot::Command';
 
+has param 'personality' => (
+	isa => SimpleStr,
+	default => 'default',
+);
+
 has field 'claude_config' => (
 	isa => HashRef,
 	default => sub {
@@ -93,8 +98,9 @@ has field 'ua' => (
 sub system_text ($self, $ctx)
 {
 	state $template = Mojo::Template->new(vars => 1);
+	my $personality = $self->personality;
 	my $system_prompt = $template->render_file(
-		'system.tpl', {
+		"system.$personality.ep", {
 			bot => $self,
 			ctx => $ctx,
 		}
