@@ -41,14 +41,17 @@ Mojo::IOLoop->recurring(
 			local $SIG{ALRM} = sub { die 'noinput' };
 			ualarm 100000;
 			$msg = readline STDIN;
+			die 'eof' unless defined $msg;
 			chomp $msg;
 		}
 		catch ($e) {
 			return if $e =~ /noinput/;
+			Mojo::IOLoop->stop if $e =~ /eof/;
 		}
 
 		alarm 0;
 		$awaiting_input = !!0;
+		return if ($msg // '') eq '';
 
 		$ctx = Bot::Context->new(
 			user => $user,
