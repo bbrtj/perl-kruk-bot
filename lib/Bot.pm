@@ -55,7 +55,7 @@ has field 'tools' => (
 			Bot::AITool::ReadChat->register($self),
 			Bot::AITool::SaveSelfNote->register($self),
 			Bot::AITool::SaveUserNote->register($self),
-		}
+		};
 	},
 );
 
@@ -65,7 +65,7 @@ has field 'commands' => (
 		return {
 			Bot::Command::MyNotes->register($self),
 			Bot::Command::Notes->register($self),
-		}
+		};
 	},
 );
 
@@ -93,10 +93,12 @@ has field 'ua' => (
 sub system_text ($self, $ctx)
 {
 	state $template = Mojo::Template->new(vars => 1);
-	my $system_prompt = $template->render_file('system.tpl', {
-		bot => $self,
-		ctx => $ctx,
-	});
+	my $system_prompt = $template->render_file(
+		'system.tpl', {
+			bot => $self,
+			ctx => $ctx,
+		}
+	);
 
 	return $system_prompt;
 }
@@ -138,11 +140,15 @@ sub use_tool ($self, $ctx, $tool_data)
 	my $result = $self->tools->{$tool_data->{name}}->runner($ctx, $tool_data->{input});
 
 	push $self->conversations->{$ctx->user}->@*, ['assistant', [$tool_data]];
-	push $self->conversations->{$ctx->user}->@*, ['user', [{
-		type => 'tool_result',
-		tool_use_id => $tool_data->{id},
-		content => $result,
-	}]];
+	push $self->conversations->{$ctx->user}->@*, [
+		'user', [
+			{
+				type => 'tool_result',
+				tool_use_id => $tool_data->{id},
+				content => $result,
+			}
+		]
+	];
 }
 
 sub handle_command ($self, $ctx)
@@ -176,7 +182,9 @@ sub query_bot ($self, $ctx)
 	if (!$ctx->has_channel && !$ctx->user_of($self->trusted_users)) {
 		my $user = $ctx->user;
 		my $owner = $self->owner;
-		$ctx->set_response(qq{I'm sorry, but your name "$user" is not allowed to use my AI in a private chat. Ask "$owner" to add you to trusted users.});
+		$ctx->set_response(
+			qq{I'm sorry, but your name "$user" is not allowed to use my AI in a private chat. Ask "$owner" to add you to trusted users.}
+		);
 		return;
 	}
 
@@ -191,42 +199,47 @@ sub query_bot ($self, $ctx)
 			max_tokens => 1_000,
 			system => $self->system_text($ctx),
 			messages => [
-				(map {
-					+{
-						role => $_->[0],
-						content => $_->[1],
-					}
-				} $self->conversations->{$ctx->user}->@*),
+				(
+					map {
+						+{
+							role => $_->[0],
+							content => $_->[1],
+						}
+					} $self->conversations->{$ctx->user}->@*
+				),
 			],
-			tool_choice => { type => 'auto' },
+			tool_choice => {type => 'auto'},
 			tools => [
 				map { $_->definition } grep { $_->available($ctx) } values $self->tools->%*
 			],
 		},
-	)->then(sub ($tx) {
-		my $res = $tx->result;
-		die Dumper(['API error', $res])
-			unless $res->is_success;
+	)->then(
+		sub ($tx) {
+			my $res = $tx->result;
+			die Dumper(['API error', $res])
+				unless $res->is_success;
 
-		my $reply;
-		foreach my $res_data ($res->json->{content}->@*) {
-			if ($res_data->{type} eq 'text') {
-				$reply = $res_data->{text};
+			my $reply;
+			foreach my $res_data ($res->json->{content}->@*) {
+				if ($res_data->{type} eq 'text') {
+					$reply = $res_data->{text};
+				}
+				elsif ($res_data->{type} eq 'tool_use') {
+					$self->use_tool($ctx, $res_data);
+				}
 			}
-			elsif ($res_data->{type} eq 'tool_use') {
-				$self->use_tool($ctx, $res_data);
-			}
-		}
 
-		if ($res->json->{stop_reason} eq 'tool_use') {
-			# TODO: wait until tools are finished?
-			$self->query_bot($ctx);
+			if ($res->json->{stop_reason} eq 'tool_use') {
+
+				# TODO: wait until tools are finished?
+				$self->query_bot($ctx);
+			}
+			else {
+				$ctx->set_response($reply);
+				$self->add_bot_response($ctx);
+			}
 		}
-		else {
-			$ctx->set_response($reply);
-			$self->add_bot_response($ctx);
-		}
-	});
+	);
 
 	return;
 }

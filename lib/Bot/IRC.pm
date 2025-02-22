@@ -30,6 +30,7 @@ has field 'irc_instance' => (
 			nick => $self->config->{nick},
 			user => $self->config->{nick},
 			server => $self->config->{server},
+
 			# tls => {},
 		);
 	},
@@ -122,7 +123,8 @@ sub speak ($self, $ctx)
 	if ($ctx->has_channel) {
 		$irc->write(privmsg => $ctx->channel, ":$user: $_") foreach splice @lines, 0, 5;
 		$irc->write(privmsg => $ctx->channel, ":$user: [response was truncated]") if @lines;
-	} else {
+	}
+	else {
 		$irc->write(privmsg => $user, ":$_") foreach @lines;
 	}
 }
@@ -131,50 +133,62 @@ sub configure ($self, $react_sub)
 {
 	my $irc = $self->irc_instance;
 
-	$irc->on(irc_mode => sub ($, $msg) {
-		foreach my $channel (split /,/, $self->config->{channel}) {
-			$irc->write(join => $channel);
-			say 'joining channel ' . $channel;
+	$irc->on(
+		irc_mode => sub ($, $msg) {
+			foreach my $channel (split /,/, $self->config->{channel}) {
+				$irc->write(join => $channel);
+				say 'joining channel ' . $channel;
+			}
 		}
-	});
+	);
 
-	$irc->on(irc_join => sub ($, $msg) {
-		say "joined channel $msg->{params}[0]";
-	});
-
-	$irc->on(irc_notice => sub ($, $msg) {
-		if ($msg->{params}[1] =~ /\/msg nickserv identify/i) {
-			$irc->write(ns => 'identify', $self->config->{password});
+	$irc->on(
+		irc_join => sub ($, $msg) {
+			say "joined channel $msg->{params}[0]";
 		}
-	});
+	);
 
-	$irc->on(irc_privmsg => sub ($, $msg) {
-		my $msg_data = $self->dispatch($msg);
-		return if !$msg_data;
-
-		$react_sub->($msg_data);
-	});
-
-	$irc->ioloop->recurring(60 => sub {
-		my $threshold = time - $self->snippet_lifetime;
-
-		my $expired = Bot::Schema::Snippet::Manager->get_snippets(
-			query => [
-				created_at => { lt => $threshold },
-			],
-		);
-
-		foreach my $item (@$expired) {
-			$item->delete;
+	$irc->on(
+		irc_notice => sub ($, $msg) {
+			if ($msg->{params}[1] =~ /\/msg nickserv identify/i) {
+				$irc->write(ns => 'identify', $self->config->{password});
+			}
 		}
-	});
+	);
+
+	$irc->on(
+		irc_privmsg => sub ($, $msg) {
+			my $msg_data = $self->dispatch($msg);
+			return if !$msg_data;
+
+			$react_sub->($msg_data);
+		}
+	);
+
+	$irc->ioloop->recurring(
+		60 => sub {
+			my $threshold = time - $self->snippet_lifetime;
+
+			my $expired = Bot::Schema::Snippet::Manager->get_snippets(
+				query => [
+					created_at => {lt => $threshold},
+				],
+			);
+
+			foreach my $item (@$expired) {
+				$item->delete;
+			}
+		}
+	);
 }
 
 sub connect ($self)
 {
-	$self->irc_instance->connect(sub ($irc, $err) {
-		say 'connected';
-		warn $err if $err;
-	});
+	$self->irc_instance->connect(
+		sub ($irc, $err) {
+			say 'connected';
+			warn $err if $err;
+		}
+	);
 }
 

@@ -16,17 +16,17 @@ has field 'definition' => (
 
 sub name
 {
-	...
+	...;
 }
 
 sub _build_definition ($self)
 {
-	...
+	...;
 }
 
 sub runner ($self, $ctx, $input)
 {
-	...
+	...;
 }
 
 sub available ($self, $ctx)

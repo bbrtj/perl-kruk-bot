@@ -12,7 +12,8 @@ sub _build_definition ($self)
 {
 	return {
 		name => $self->name,
-		description  => q{Save a note about yourself for later (global for all users). Only save important information.},
+		description =>
+			q{Save a note about yourself for later (global for all users). Only save important information.},
 		input_schema => {
 			type => 'object',
 			required => ['note', 'reason'],

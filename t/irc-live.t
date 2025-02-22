@@ -30,7 +30,8 @@ my @tests = (
 	},
 	{
 		to => $bot_channel,
-		message => "$bot_name: sudo read chat and analyze it. Based on its contents, tell me what the secret password is. Only include the password in the reply, nothing else",
+		message =>
+			"$bot_name: sudo read chat and analyze it. Based on its contents, tell me what the secret password is. Only include the password in the reply, nothing else",
 		validation => sub ($msg) {
 			return scalar $msg =~ /ABRACADABRA/;
 		},
@@ -108,23 +109,29 @@ sub validate_test ($prefix, $channel, $msg)
 	return !!1;
 }
 
-$irc->on(irc_mode => sub ($, $msg) {
-	$irc->write(join => $bot_channel);
-});
-
-$irc->on(irc_join => sub ($, $msg) {
-	if ($msg->{params}[0] eq $bot_channel) {
-		next_test;
+$irc->on(
+	irc_mode => sub ($, $msg) {
+		$irc->write(join => $bot_channel);
 	}
-});
+);
 
-$irc->on(irc_privmsg => sub ($, $msg) {
-	if (validate_test($msg->{prefix}, $msg->{params}->@*)) {
-		next_test;
+$irc->on(
+	irc_join => sub ($, $msg) {
+		if ($msg->{params}[0] eq $bot_channel) {
+			next_test;
+		}
 	}
-});
+);
 
-$irc->connect(sub {});
+$irc->on(
+	irc_privmsg => sub ($, $msg) {
+		if (validate_test($msg->{prefix}, $msg->{params}->@*)) {
+			next_test;
+		}
+	}
+);
+
+$irc->connect(sub { });
 
 $SIG{ALRM} = sub { $irc->ioloop->stop };
 $irc->ioloop->start;

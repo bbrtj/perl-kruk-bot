@@ -14,12 +14,12 @@ use constant bad_arguments => 'invalid command arguments';
 
 sub name ($self)
 {
-	...
+	...;
 }
 
 sub syntax ($self)
 {
-	...
+	...;
 }
 
 sub get_usage ($self)

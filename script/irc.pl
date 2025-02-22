@@ -14,42 +14,47 @@ my $bot = Bot->new;
 my $irc = Bot::IRC->new;
 my @ctxs;
 
-$irc->configure(sub ($msg) {
-	my $ctx = Bot::Context->new($msg);
+$irc->configure(
+	sub ($msg) {
+		my $ctx = Bot::Context->new($msg);
 
-	my sub respond ($response) {
-		$ctx->set_response($response);
-	}
-
-	$bot->add_message($ctx);
-
-	if ($msg->{for_me}) {
-		push @ctxs, $ctx;
-		return if $bot->handle_command($ctx);
-
-		$bot->add_bot_query($ctx);
-		$bot->query_bot($ctx);
-	}
-});
-
-Mojo::IOLoop->recurring(0.1 => sub {
-	my @new_ctxs;
-	my $now = time;
-
-	foreach my $ctx (@ctxs) {
-		if ($ctx->has_response) {
-			$irc->speak($ctx);
+		my sub respond ($response)
+		{
+			$ctx->set_response($response);
 		}
-		elsif ($now - $ctx->timestamp > 15) {
-			say "response timed out: " . Dumper($ctx);
-		}
-		else {
-			push @new_ctxs, $ctx;
+
+		$bot->add_message($ctx);
+
+		if ($msg->{for_me}) {
+			push @ctxs, $ctx;
+			return if $bot->handle_command($ctx);
+
+			$bot->add_bot_query($ctx);
+			$bot->query_bot($ctx);
 		}
 	}
+);
 
-	@ctxs = @new_ctxs;
-});
+Mojo::IOLoop->recurring(
+	0.1 => sub {
+		my @new_ctxs;
+		my $now = time;
+
+		foreach my $ctx (@ctxs) {
+			if ($ctx->has_response) {
+				$irc->speak($ctx);
+			}
+			elsif ($now - $ctx->timestamp > 15) {
+				say "response timed out: " . Dumper($ctx);
+			}
+			else {
+				push @new_ctxs, $ctx;
+			}
+		}
+
+		@ctxs = @new_ctxs;
+	}
+);
 
 $irc->connect;
 

@@ -6,7 +6,7 @@ use Mooish::Base;
 use List::Util qw(any);
 
 has param 'channel' => (
-	isa => Maybe[SimpleStr],
+	isa => Maybe [SimpleStr],
 	default => undef,
 );
 

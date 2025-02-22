@@ -12,7 +12,7 @@ sub _build_definition ($self)
 {
 	return {
 		name => $self->name,
-		description  => q{Get everyone's messages in this chat room.},
+		description => q{Get everyone's messages in this chat room.},
 		input_schema => {
 			type => 'object',
 		},
