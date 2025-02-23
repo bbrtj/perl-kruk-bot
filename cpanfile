@@ -9,6 +9,7 @@ requires 'IO::Socket::SSL';
 requires 'all';
 requires 'Data::ULID';
 requires 'Log::Dispatch';
+requires 'HTML::FormatText';
 
 requires 'Rose::DB::Object';
 requires 'DBD::Pg';

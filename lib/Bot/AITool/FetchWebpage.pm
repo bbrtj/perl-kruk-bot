@@ -3,10 +3,11 @@ package Bot::AITool::FetchWebpage;
 use v5.40;
 
 use Mooish::Base;
-use Mojo::IOLoop;
-use IPC::Open3;
 use Mojo::URL;
-use Symbol 'gensym';
+use Mojo::Promise;
+use HTML::TreeBuilder;
+use HTML::FormatText;
+use Encode qw(decode);
 
 extends 'Bot::AITool';
 
@@ -32,28 +33,34 @@ sub _build_definition ($self)
 
 sub runner ($self, $ctx, $input)
 {
-	my $url = Mojo::URL->new($input->{url});
-	$url->scheme('https') if !$url->scheme;
+	my $url = $input->{url};
+	$url = "https://$url" unless $url =~ /^http/;
 	$ctx->add_to_response("fetching $url");
 
-	return Mojo::IOLoop->subprocess->run_p(
-		sub {
-			my $pid = open3(my $stdin, my $stdout, my $stderr = gensym, 'tools/page_reader/script.mjs', "$url");
-			waitpid $pid, 0;
+	my $promise = Mojo::Promise->new;
+	$self->bot_instance->ua->get_p($url)->then(
+		sub ($tx) {
+			my $res = $tx->result;
+			my $body = $res->body;
+			my ($charset) = $res->headers->content_type =~ /; charset=([^;]+)/;
 
-			local $/;
-			my $status = $? >> 8;
+			if ($res->headers->content_type =~ /html/i) {
+				my $tree = HTML::TreeBuilder->new->parse_content($body);
+				my $formatter = HTML::FormatText->new(leftmargin => 0, rightmargin => 80);
 
-			if ($status != 0) {
-				my $err = 'Could not fetch webpage';
-				if ($stderr) {
-					$err .= ', ' . <$stderr>;
-				}
-
-				die $err;
+				$body = $formatter->format($tree);
+				$charset ||= $tree->look_down(_tag => 'meta', charset => qr/.+/)->attr('charset');
 			}
-			return <$stdout>;
+
+			$charset ||= 'utf-8';
+			$body = decode $charset, $body;
+			$promise->resolve($body);
+		},
+		sub ($err) {
+			$promise->reject($err);
 		}
 	);
+
+	return $promise;
 }
 

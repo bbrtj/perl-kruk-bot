@@ -106,14 +106,14 @@ has field 'log' => (
 
 sub _make_text_with_caching ($self, $text)
 {
+	my $should_cache = length $text > $self->claude_config->{cache_length};
+	$self->log->debug('Requesting caching of text: ' . (length $text) . ' characters')
+		if $should_cache;
+
 	return {
 		type => 'text',
 		text => $text,
-		(
-			length $text > $self->claude_config->{cache_length}
-			? (cache_control => {type => 'ephemeral'})
-			: ()
-		),
+		($should_cache ? (cache_control => {type => 'ephemeral'}) : ()),
 	};
 }
 
@@ -209,7 +209,7 @@ sub use_tool ($self, $ctx, $tool_data)
 				add_tool_result(join "\n", @data);
 			},
 			sub (@errors) {
-				$self->log->debug("Tool $tool_data->{name} usage failed: @errors");
+				$self->log->error("Tool $tool_data->{name} usage failed: @errors");
 				add_tool_result("Tool error occured: @errors");
 			}
 		);
@@ -253,6 +253,7 @@ sub query_bot ($self, $ctx)
 	if (!$ctx->has_channel && !$ctx->user_of($self->trusted_users)) {
 		my $user = $ctx->user;
 		my $owner = $self->owner;
+		$self->log->notice("User $user got refused the private use of AI");
 		$ctx->set_response(
 			qq{I'm sorry, but your name "$user" is not allowed to use my AI in a private chat. Ask "$owner" to add you to trusted users.}
 		);
@@ -320,6 +321,9 @@ sub query_bot ($self, $ctx)
 			else {
 				fulfill;
 			}
+		},
+		sub (@err) {
+			$self->log->error("Unfulfilled AI query promise: @err");
 		}
 	);
 
