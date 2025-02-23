@@ -34,6 +34,7 @@ sub _build_definition ($self)
 
 sub runner ($self, $ctx, $input)
 {
+	$ctx->add_to_response("noting down") if $input->{reason} eq 'requested';
 	$self->bot_instance->notes->store($input->{note}, aspect => $ctx->user, reason => $input->{reason});
 	return 'saved';
 }

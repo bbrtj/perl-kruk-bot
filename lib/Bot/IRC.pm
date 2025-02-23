@@ -120,7 +120,7 @@ sub partition_text ($self, $text, $prefix)
 
 sub speak ($self, $ctx)
 {
-	my $msg = $ctx->response;
+	my $msg = $ctx->full_response;
 	my $user = $ctx->user;
 
 	my $prefix = $ctx->has_channel ? ":$user:" : ':';

@@ -22,7 +22,7 @@ Mojo::IOLoop->recurring(
 	0.1 => sub {
 		return if !$ctx || !$ctx->has_response;
 
-		say $ctx->response;
+		say $ctx->full_response;
 		$ctx = undef;
 	}
 );

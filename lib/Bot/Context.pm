@@ -18,6 +18,11 @@ has param 'message' => (
 	isa => Str,
 );
 
+has field 'response_extras' => (
+	isa => ArrayRef,
+	default => sub { [] },
+);
+
 has field 'response' => (
 	isa => Str,
 	writer => 1,
@@ -28,6 +33,19 @@ has field 'timestamp' => (
 	isa => PositiveInt,
 	default => sub { time },
 );
+
+sub add_to_response ($self, $text)
+{
+	push $self->response_extras->@*, $text;
+}
+
+sub full_response ($self)
+{
+	my @extras = $self->response_extras->@*;
+	@extras = map { "<$_>" } @extras;
+
+	return join ' ', @extras, $self->response;
+}
 
 sub has_channel ($self)
 {

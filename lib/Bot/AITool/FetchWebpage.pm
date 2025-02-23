@@ -32,11 +32,12 @@ sub _build_definition ($self)
 
 sub runner ($self, $ctx, $input)
 {
+	my $url = Mojo::URL->new($input->{url});
+	$url->scheme('https') if !$url->scheme;
+	$ctx->add_to_response("fetching $url");
+
 	return Mojo::IOLoop->subprocess->run_p(
 		sub {
-			my $url = Mojo::URL->new($input->{url});
-			$url->scheme('https') if !$url->scheme;
-
 			my $pid = open3(my $stdin, my $stdout, my $stderr = gensym, 'tools/page_reader/script.mjs', "$url");
 			waitpid $pid, 0;
 
