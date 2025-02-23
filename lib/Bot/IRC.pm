@@ -12,6 +12,7 @@ use Bot::Log;
 use Web;
 
 use constant MAX_IRC_MESSAGE_LENGTH => 430;
+use constant NICK_RE => qr{[^ ,*?!@.:#&~+%][^ ,*?!@.:]*};
 
 has param 'config' => (
 	isa => HashRef,
@@ -64,10 +65,10 @@ sub dispatch ($self, $msg)
 	return unless ($is_private && $channel eq $conf->{nick})
 		|| (!$is_private && any { $_ eq $channel } split /,/, $conf->{channel});
 
-	my ($user) = $msg->{prefix} =~ /^(\w+)/;
+	my ($user) = $msg->{prefix} =~ /^(@{[NICK_RE]})/;
 
 	my $for_me = $is_private;
-	if ($line =~ /^(\w+):/) {
+	if ($line =~ /^(@{[NICK_RE]}):/) {
 		$for_me = fc $1 eq fc $conf->{nick};
 		$line =~ s/^\Q$conf->{nick}:\E//i
 			if $for_me;
