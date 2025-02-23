@@ -57,6 +57,7 @@ sub build_config ($self)
 			'Screen',
 			name => 'output',
 			stderr => 0,
+			min_level => 'debug',
 			callbacks => $self->_get_screen_callback,
 		],
 	] unless $self->has_filename;
