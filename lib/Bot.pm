@@ -104,6 +104,19 @@ has field 'log' => (
 	},
 );
 
+sub _make_text_with_caching ($self, $text)
+{
+	return {
+		type => 'text',
+		text => $text,
+		(
+			length $text > $self->claude_config->{cache_length}
+			? (cache_control => {type => 'ephemeral'})
+			: ()
+		),
+	};
+}
+
 sub system_prompts ($self, $ctx)
 {
 	state $template = Mojo::Template->new(vars => 1);
@@ -132,12 +145,7 @@ sub system_prompts ($self, $ctx)
 		$self->notes->dump(prefix => 'Here is your diary:'),
 		$self->notes->dump(aspect => $ctx->user, prefix => 'Here are your notes about the user:');
 
-	@prompts = map { +{type => 'text', text => $_} } @prompts;
-	foreach my $prompt (@prompts) {
-		$prompt->{cache_control} = {type => 'ephemeral'}
-			if length $prompt->{text} > $self->claude_config->{cache_length};
-	}
-
+	@prompts = map { $self->_make_text_with_caching($_) } @prompts;
 	return \@prompts;
 }
 
@@ -188,15 +196,7 @@ sub use_tool ($self, $ctx, $tool_data)
 						type => 'tool_result',
 						tool_use_id => $tool_data->{id},
 						content => [
-							{
-								type => 'text',
-								text => $result,
-								(
-									length $result > $self->claude_config->{cache_length}
-									? (cache_control => 'ephemeral')
-									: ()
-								),
-							}
+							$self->_make_text_with_caching($result)
 						],
 					}
 				]
