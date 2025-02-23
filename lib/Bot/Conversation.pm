@@ -6,6 +6,7 @@ use Mooish::Base;
 
 has param 'personality' => (
 	isa => SimpleStr,
+	writer => 1,
 );
 
 has param 'history_size' => (

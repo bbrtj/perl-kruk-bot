@@ -85,6 +85,7 @@ has field 'commands' => (
 			Bot::Command::Help->register($self),
 			Bot::Command::MyNotes->register($self),
 			Bot::Command::Notes->register($self),
+			Bot::Command::Personality->register($self),
 		};
 	},
 );
@@ -138,10 +139,11 @@ sub get_conversation ($self, $ctx)
 sub system_prompts ($self, $ctx)
 {
 	state $template = Mojo::Template->new(vars => 1);
+	my $conv = $self->get_conversation($ctx);
 	my @prompts;
 
 	push @prompts, $template->render_file(
-		"prompts/personality.@{[$self->personality]}.ep", {
+		"prompts/personality.@{[$conv->personality]}.ep", {
 			bot => $self,
 			ctx => $ctx,
 		}
@@ -239,7 +241,7 @@ sub handle_command ($self, $ctx)
 				$ctx->set_response($self->commands->{$command}->runner($ctx, @args));
 			}
 			catch ($e) {
-				say $e;
+				$self->log->debug($e);
 				$ctx->set_response('Command error. Usage: ' . $self->commands->{$command}->get_usage);
 			}
 		}
