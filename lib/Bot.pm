@@ -10,6 +10,7 @@ use Data::Dumper;
 
 use Bot::Log;
 use Bot::Notes;
+use Bot::Conversation;
 use all 'Bot::AITool';
 use all 'Bot::Command';
 
@@ -25,6 +26,11 @@ has param 'personality' => (
 has param 'history_size' => (
 	isa => PositiveInt,
 	default => 25,
+);
+
+has param 'conversation_lifetime' => (
+	isa => PositiveInt,
+	default => sub { $ENV{KRUK_CONVERSATION_LIFETIME} // 120 },
 );
 
 has param 'owner' => (
@@ -56,7 +62,7 @@ has field 'observed_messages' => (
 );
 
 has field 'conversations' => (
-	isa => HashRef [Tuple [Str, Str | Object]],
+	isa => HashRef [InstanceOf ['Bot::Conversation']],
 	default => sub { {} },
 );
 
@@ -117,6 +123,18 @@ sub _make_text_with_caching ($self, $text)
 	};
 }
 
+sub get_conversation ($self, $ctx)
+{
+	my $conv = $self->conversations->{$ctx->user} //= Bot::Conversation->new(
+		personality => $self->personality,
+		history_size => $self->history_size,
+		conversation_lifetime => $self->conversation_lifetime,
+	);
+
+	$conv->clear if $conv->expired;
+	return $conv;
+}
+
 sub system_prompts ($self, $ctx)
 {
 	state $template = Mojo::Template->new(vars => 1);
@@ -159,23 +177,12 @@ sub add_message ($self, $ctx)
 
 sub add_bot_query ($self, $ctx)
 {
-	my $convs = $self->conversations->{$ctx->user} //= [];
-	if (@$convs && $convs->[-1][0] eq 'user') {
-		if (ref $convs->[-1][1] ne 'ARRAY') {
-			$convs->[-1][1] = [$convs->[-1][1]];
-		}
-		push $convs->[-1][1]->@*, $ctx->message;
-	}
-	else {
-		push @$convs, ['user', $ctx->message];
-	}
-
-	splice @$convs, 0, -1 * $self->history_size * 2;
+	$self->get_conversation($ctx)->add_message('user', $ctx->message);
 }
 
 sub add_bot_response ($self, $ctx)
 {
-	push $self->conversations->{$ctx->user}->@*, ['assistant', $ctx->response];
+	$self->get_conversation($ctx)->add_message('assistant', $ctx->response);
 }
 
 sub use_tool ($self, $ctx, $tool_data)
@@ -188,19 +195,17 @@ sub use_tool ($self, $ctx, $tool_data)
 
 	my sub add_tool_result ($result)
 	{
-		push $self->conversations->{$ctx->user}->@*,
-			['assistant', [$tool_data]],
-			[
-				'user', [
-					{
-						type => 'tool_result',
-						tool_use_id => $tool_data->{id},
-						content => [
-							$self->_make_text_with_caching($result)
-						],
-					}
-				]
-			];
+		$self->get_conversation($ctx)
+			->add_message('assistant', $tool_data)
+			->add_message(
+				'user', {
+					type => 'tool_result',
+					tool_use_id => $tool_data->{id},
+					content => [
+						$self->_make_text_with_caching($result)
+					],
+				}
+			);
 	}
 
 	if ($result isa 'Mojo::Promise') {
@@ -270,16 +275,7 @@ sub query_bot ($self, $ctx)
 			model => $self->claude_config->{model},
 			max_tokens => 1_000,
 			system => $self->system_prompts($ctx),
-			messages => [
-				(
-					map {
-						+{
-							role => $_->[0],
-							content => $_->[1],
-						}
-					} $self->conversations->{$ctx->user}->@*
-				),
-			],
+			messages => $self->get_conversation($ctx)->api_call_format_messages,
 			tool_choice => {type => 'auto'},
 			tools => [
 				map { $_->definition } grep { $_->available($ctx) } values $self->tools->%*

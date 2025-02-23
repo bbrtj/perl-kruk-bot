@@ -30,8 +30,10 @@ subtest 'should fetch a webpage' => sub {
 
 	$p->wait if $p;
 
-	is $bot->conversations->{$ctx->user}[-1][0], 'user', 'last entry is user role ok';
-	like $bot->conversations->{$ctx->user}[-1][1][0]{content}[0]{text}, qr/about me/i, 'website data looks ok';
+	my $conv = $bot->get_conversation($ctx);
+	my $last_message = $conv->messages->[-1];
+	is $last_message->[0], 'user', 'last entry is user role ok';
+	like $last_message->[1][0]{content}[0]{text}, qr/about me/i, 'website data looks ok';
 	is $ctx->response_extras->[0], 'fetching https://bbrtj.eu', 'user informed ok';
 };
 
