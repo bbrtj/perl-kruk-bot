@@ -29,13 +29,13 @@ has param 'history_size' => (
 
 has param 'owner' => (
 	isa => SimpleStr,
-	default => $ENV{KRUK_OWNER},
+	default => $ENV{KRUK_OWNER} // 'user',
 );
 
 has param 'trusted_users' => (
 	isa => ArrayRef,
-	default => sub {
-		[split /,/, $ENV{KRUK_TRUSTED_USERS}]
+	lazy => sub ($self) {
+		[split /,/, $ENV{KRUK_TRUSTED_USERS} // $self->owner]
 	}
 );
 
@@ -45,7 +45,7 @@ has field 'claude_config' => (
 		return {
 			api_key => $ENV{KRUK_CLAUDE_API_KEY},
 			model => $ENV{KRUK_CLAUDE_MODEL},
-			cache_length => $ENV{KRUK_CLAUDE_CACHE_LENGTH},
+			cache_length => $ENV{KRUK_CLAUDE_CACHE_LENGTH} // 4000,
 		};
 	},
 );
@@ -316,14 +316,18 @@ sub query_bot ($self, $ctx)
 			}
 
 			if (@promises) {
-				Mojo::Promise->all(@promises)->then((\&fulfill) x 2);
+				Mojo::Promise->all(@promises)->finally(\&fulfill);
 			}
 			else {
 				fulfill;
 			}
 		},
 		sub (@err) {
-			$self->log->error("Unfulfilled AI query promise: @err");
+			$self->log->error("Failed AI query: @err");
+		}
+	)->catch(
+		sub (@err) {
+			$self->log->error("AI query handler error: @err");
 		}
 	);
 

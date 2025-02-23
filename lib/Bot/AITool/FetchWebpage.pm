@@ -4,10 +4,15 @@ use v5.40;
 
 use Mooish::Base;
 use Mojo::URL;
-use Mojo::Promise;
 use HTML::TreeBuilder;
 use HTML::FormatText;
 use Encode qw(decode);
+use List::Util qw(any);
+
+# needed for HTML::Element to find these in look_down
+$HTML::Tagset::isBodyElement{nav} = 1;
+$HTML::Tagset::isBodyElement{header} = 1;
+$HTML::Tagset::isBodyElement{footer} = 1;
 
 extends 'Bot::AITool';
 
@@ -37,8 +42,7 @@ sub runner ($self, $ctx, $input)
 	$url = "https://$url" unless $url =~ /^http/;
 	$ctx->add_to_response("fetching $url");
 
-	my $promise = Mojo::Promise->new;
-	$self->bot_instance->ua->get_p($url)->then(
+	return $self->bot_instance->ua->get_p($url)->then(
 		sub ($tx) {
 			my $res = $tx->result;
 			my $body = $res->body;
@@ -48,19 +52,29 @@ sub runner ($self, $ctx, $input)
 				my $tree = HTML::TreeBuilder->new->parse_content($body);
 				my $formatter = HTML::FormatText->new(leftmargin => 0, rightmargin => 80);
 
+				my $unneeded = sub ($el) {
+					my $tag = fc $el->tag;
+					return any { $tag eq fc $_ } qw(nav header footer);
+				};
+
+				foreach my $element ($tree->look_down($unneeded)) {
+					$element->destroy;
+				}
+
 				$body = $formatter->format($tree);
 				$charset ||= $tree->look_down(_tag => 'meta', charset => qr/.+/)->attr('charset');
 			}
 
 			$charset ||= 'utf-8';
 			$body = decode $charset, $body;
-			$promise->resolve($body);
+			$body =~ s{\h+}{ }g;
+			$body =~ s{\v\h?\v}{\n}g;
+
+			return $body;
 		},
 		sub ($err) {
-			$promise->reject($err);
+			return $err;
 		}
 	);
-
-	return $promise;
 }
 
