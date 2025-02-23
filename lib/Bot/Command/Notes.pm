@@ -8,6 +8,7 @@ extends 'Bot::Command';
 
 use constant name => 'notes';
 use constant syntax => '(remove <n>)';
+use constant description => 'check and remove bot diary notes';
 
 sub runner ($self, $ctx, @args)
 {

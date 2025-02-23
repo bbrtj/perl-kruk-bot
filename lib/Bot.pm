@@ -76,6 +76,7 @@ has field 'commands' => (
 	isa => HashRef [InstanceOf ['Bot::Command']],
 	default => sub ($self) {
 		return {
+			Bot::Command::Help->register($self),
 			Bot::Command::MyNotes->register($self),
 			Bot::Command::Notes->register($self),
 		};
