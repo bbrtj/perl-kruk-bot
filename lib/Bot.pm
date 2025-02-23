@@ -123,7 +123,7 @@ sub system_prompts ($self, $ctx)
 	my @prompts;
 
 	push @prompts, $template->render_file(
-		"prompts/system.@{[$self->personality]}.ep", {
+		"prompts/personality.@{[$self->personality]}.ep", {
 			bot => $self,
 			ctx => $ctx,
 		}
