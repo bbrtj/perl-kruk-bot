@@ -4,4 +4,5 @@
 prompts/system.*.ep
 local
 *.db
+*.log
 

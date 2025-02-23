@@ -1,0 +1,15 @@
+{
+  "name": "page_reader",
+  "version": "1.0.0",
+  "description": "",
+  "main": "script.js",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@mozilla/readability": "^0.5.0",
+    "axios": "^1.7.7",
+    "jsdom": "^25.0.0"
+  }
+}
+

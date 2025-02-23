@@ -5,8 +5,10 @@ use v5.40;
 use Mooish::Base;
 use Mojo::UserAgent;
 use Mojo::Template;
+use Mojo::Promise;
 use Data::Dumper;
 
+use Bot::Log;
 use Bot::Notes;
 use all 'Bot::AITool';
 use all 'Bot::Command';
@@ -18,17 +20,6 @@ has param 'environment' => (
 has param 'personality' => (
 	isa => SimpleStr,
 	default => 'default',
-);
-
-has field 'claude_config' => (
-	isa => HashRef,
-	default => sub {
-		return {
-			api_key => $ENV{KRUK_CLAUDE_API_KEY},
-			model => $ENV{KRUK_CLAUDE_MODEL},
-			cache_length => $ENV{KRUK_CLAUDE_CACHE_LENGTH},
-		};
-	},
 );
 
 has param 'history_size' => (
@@ -48,6 +39,17 @@ has param 'trusted_users' => (
 	}
 );
 
+has field 'claude_config' => (
+	isa => HashRef,
+	default => sub {
+		return {
+			api_key => $ENV{KRUK_CLAUDE_API_KEY},
+			model => $ENV{KRUK_CLAUDE_MODEL},
+			cache_length => $ENV{KRUK_CLAUDE_CACHE_LENGTH},
+		};
+	},
+);
+
 has field 'observed_messages' => (
 	isa => HashRef [ArrayRef [Tuple [Str, Str]]],
 	default => sub { {} },
@@ -65,6 +67,7 @@ has field 'tools' => (
 			Bot::AITool::ReadChat->register($self),
 			Bot::AITool::SaveSelfNote->register($self),
 			Bot::AITool::SaveUserNote->register($self),
+			Bot::AITool::FetchWebpage->register($self),
 		};
 	},
 );
@@ -90,6 +93,13 @@ has field 'ua' => (
 	isa => InstanceOf ['Mojo::UserAgent'],
 	default => sub {
 		Mojo::UserAgent->new;
+	},
+);
+
+has field 'log' => (
+	isa => InstanceOf ['Bot::Log'],
+	default => sub {
+		Bot::Log->new(filename => 'bot.log');
 	},
 );
 
@@ -164,18 +174,51 @@ sub use_tool ($self, $ctx, $tool_data)
 	die "Undefined tool $tool_data->{name}"
 		unless $self->tools->{$tool_data->{name}};
 
+	$self->log->debug("Using AI tool $tool_data->{name}");
 	my $result = $self->tools->{$tool_data->{name}}->runner($ctx, $tool_data->{input});
 
-	push $self->conversations->{$ctx->user}->@*, ['assistant', [$tool_data]];
-	push $self->conversations->{$ctx->user}->@*, [
-		'user', [
-			{
-				type => 'tool_result',
-				tool_use_id => $tool_data->{id},
-				content => $result,
+	my sub add_tool_result ($result)
+	{
+		push $self->conversations->{$ctx->user}->@*,
+			['assistant', [$tool_data]],
+			[
+				'user', [
+					{
+						type => 'tool_result',
+						tool_use_id => $tool_data->{id},
+						content => [
+							{
+								type => 'text',
+								text => $result,
+								(
+									length $result > $self->claude_config->{cache_length}
+									? (cache_control => 'ephemeral')
+									: ()
+								),
+							}
+						],
+					}
+				]
+			];
+	}
+
+	if ($result isa 'Mojo::Promise') {
+		$result->then(
+			sub (@data) {
+				add_tool_result(join "\n", @data);
+			},
+			sub (@errors) {
+				$self->log->debug("Tool $tool_data->{name} usage failed: @errors");
+				add_tool_result("Tool error occured: @errors");
 			}
-		]
-	];
+		);
+
+		return $result;
+	}
+	else {
+		add_tool_result($result);
+		return undef;
+	}
 }
 
 sub handle_command ($self, $ctx)
@@ -247,23 +290,34 @@ sub query_bot ($self, $ctx)
 				unless $res->is_success;
 
 			my $reply;
+			my @promises;
 			foreach my $res_data ($res->json->{content}->@*) {
 				if ($res_data->{type} eq 'text') {
 					$reply = $res_data->{text};
 				}
 				elsif ($res_data->{type} eq 'tool_use') {
-					$self->use_tool($ctx, $res_data);
+					push @promises, $self->use_tool($ctx, $res_data);
 				}
 			}
 
-			if ($res->json->{stop_reason} eq 'tool_use') {
+			@promises = grep { defined } @promises;
 
-				# TODO: wait until tools are finished?
-				$self->query_bot($ctx);
+			my sub fulfill
+			{
+				if ($res->json->{stop_reason} eq 'tool_use') {
+					$self->query_bot($ctx);
+				}
+				else {
+					$ctx->set_response($reply);
+					$self->add_bot_response($ctx);
+				}
+			}
+
+			if (@promises) {
+				Mojo::Promise->all(@promises)->then((\&fulfill) x 2);
 			}
 			else {
-				$ctx->set_response($reply);
-				$self->add_bot_response($ctx);
+				fulfill;
 			}
 		}
 	);

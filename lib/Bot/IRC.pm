@@ -6,7 +6,9 @@ use Mooish::Base;
 use Mojo::IRC;
 use List::Util qw(any);
 use Encode qw(encode decode);
+
 use Bot::Schema::Snippet;
+use Bot::Log;
 use Web;
 
 use constant MAX_IRC_MESSAGE_LENGTH => 430;
@@ -44,6 +46,13 @@ has field 'web_instance' => (
 has field 'snippet_lifetime' => (
 	isa => PositiveInt,
 	default => sub { ($ENV{KRUK_SNIPPET_LIFETIME} // 1440) * 60 },
+);
+
+has field 'log' => (
+	isa => InstanceOf ['Bot::Log'],
+	default => sub {
+		Bot::Log->new;
+	},
 );
 
 sub dispatch ($self, $msg)
@@ -137,14 +146,14 @@ sub configure ($self, $react_sub)
 		irc_mode => sub ($, $msg) {
 			foreach my $channel (split /,/, $self->config->{channel}) {
 				$irc->write(join => $channel);
-				say 'joining channel ' . $channel;
+				$self->log->info("joining channel $channel");
 			}
 		}
 	);
 
 	$irc->on(
 		irc_join => sub ($, $msg) {
-			say "joined channel $msg->{params}[0]";
+			$self->log->info("joined channel $msg->{params}[0]");
 		}
 	);
 
@@ -186,7 +195,7 @@ sub connect ($self)
 {
 	$self->irc_instance->connect(
 		sub ($irc, $err) {
-			say 'connected';
+			$self->log->info('connected');
 			warn $err if $err;
 		}
 	);
