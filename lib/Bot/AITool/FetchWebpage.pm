@@ -16,6 +16,16 @@ $HTML::Tagset::isBodyElement{footer} = 1;
 
 extends 'Bot::AITool';
 
+has field 'ua' => (
+	isa => InstanceOf ['Mojo::UserAgent'],
+	default => sub {
+		Mojo::UserAgent->new(
+			connect_timeout => 10,
+			max_redirects => 3,
+		);
+	},
+);
+
 use constant name => 'fetch_webpage';
 
 sub _build_definition ($self)
@@ -40,15 +50,15 @@ sub runner ($self, $ctx, $input)
 {
 	my $url = $input->{url};
 	$url = "https://$url" unless $url =~ /^http/;
-	$ctx->add_to_response("fetching $url");
 
-	return $self->bot_instance->ua->get_p($url)->then(
+	return $self->ua->get_p($url)->then(
 		sub ($tx) {
 			my $res = $tx->result;
-			my $body = $res->body;
-			my ($charset) = $res->headers->content_type =~ /; charset=([^;]+)/;
+			$ctx->add_to_response("fetching $url - " . $res->code);
+			my $content_type = $res->headers->content_type // '';
+			my $body = $res->text;
 
-			if ($res->headers->content_type =~ /html/i) {
+			if ($content_type =~ /html/i) {
 				my $tree = HTML::TreeBuilder->new->parse_content($body);
 				my $formatter = HTML::FormatText->new(leftmargin => 0, rightmargin => 80);
 
@@ -61,19 +71,20 @@ sub runner ($self, $ctx, $input)
 					$element->destroy;
 				}
 
-				$body = $formatter->format($tree);
-				$charset ||= $tree->look_down(_tag => 'meta', charset => qr/.+/)->attr('charset');
+				# handle html charset?
+				#$body = $formatter->format($tree);
+				#my $charset_el = $tree->look_down(_tag => 'meta', charset => qr/.+/);
+				#$charset = $charset_el->attr('charset') if $charset_el;
 			}
 
-			$charset ||= 'utf-8';
-			$body = decode $charset, $body;
 			$body =~ s{\h+}{ }g;
 			$body =~ s{\v\h?\v}{\n}g;
 
 			return $body;
 		},
 		sub ($err) {
-			return $err;
+			$ctx->add_to_response("fetching $url - failed");
+			return "Error fetching webpage: $err";
 		}
 	);
 }

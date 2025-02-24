@@ -217,7 +217,7 @@ sub use_tool ($self, $ctx, $tool_data)
 			},
 			sub (@errors) {
 				$self->log->error("Tool $tool_data->{name} usage failed: @errors");
-				add_tool_result("Tool error occured: @errors");
+				add_tool_result('Tool error occured');
 			}
 		);
 
