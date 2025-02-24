@@ -49,7 +49,7 @@ sub _build_definition ($self)
 sub runner ($self, $ctx, $input)
 {
 	my $url = $input->{url};
-	$url = "https://$url" unless $url =~ /^http/;
+	$url = "https://$url" unless $url =~ m{^https?://};
 
 	return $self->ua->get_p($url)->then(
 		sub ($tx) {

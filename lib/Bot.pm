@@ -6,7 +6,6 @@ use Mooish::Base;
 use Mojo::UserAgent;
 use Mojo::Template;
 use Mojo::Promise;
-use Data::Dumper;
 
 use Bot::Log;
 use Bot::Notes;
@@ -124,19 +123,7 @@ sub _make_text_with_caching ($self, $text)
 	};
 }
 
-sub get_conversation ($self, $ctx)
-{
-	my $conv = $self->conversations->{$ctx->user} //= Bot::Conversation->new(
-		personality => $self->personality,
-		history_size => $self->history_size,
-		conversation_lifetime => $self->conversation_lifetime,
-	);
-
-	$conv->clear if $conv->expired;
-	return $conv;
-}
-
-sub system_prompts ($self, $ctx)
+sub _system_prompts ($self, $ctx)
 {
 	state $template = Mojo::Template->new(vars => 1);
 	my $conv = $self->get_conversation($ctx);
@@ -169,22 +156,90 @@ sub system_prompts ($self, $ctx)
 	return \@prompts;
 }
 
-sub add_message ($self, $ctx)
-{
-	my $msgs = $self->observed_messages->{$ctx->channel_text} //= [];
-	push @$msgs, [$ctx->user, $ctx->message];
-
-	splice @$msgs, 0, -1 * $self->history_size;
-}
-
-sub add_bot_query ($self, $ctx)
+sub _add_ai_query ($self, $ctx)
 {
 	$self->get_conversation($ctx)->add_message('user', $ctx->message);
 }
 
-sub add_bot_response ($self, $ctx)
+sub _add_ai_response ($self, $ctx)
 {
 	$self->get_conversation($ctx)->add_message('assistant', $ctx->response);
+}
+
+sub _handle_command ($self, $ctx)
+{
+	my $prefix = quotemeta Bot::Command->prefix;
+	if ($ctx->message =~ m{^\s*$prefix(\w+)(?: (.+))?$}) {
+		my $command = $1;
+		my @args = split /\s+/, $2 // '';
+
+		if ($self->commands->{$command}) {
+			try {
+				$ctx->set_response($self->commands->{$command}->runner($ctx, @args));
+			}
+			catch ($e) {
+				$self->log->debug($e);
+				$ctx->set_response('Command error. Usage: ' . $self->commands->{$command}->get_usage);
+			}
+		}
+		else {
+			$ctx->set_response('Unknown command');
+		}
+
+		return !!1;
+	}
+
+	return !!0;
+}
+
+sub _finalize_ai_reply ($self, $ctx, $reason, $reply)
+{
+	if ($reason eq 'tool_use') {
+		$self->requery($ctx);
+	}
+	else {
+		$ctx->set_response($reply);
+		$self->_add_ai_response($ctx);
+	}
+}
+
+sub _process_query_data ($self, $ctx, $json)
+{
+	my $reply;
+	my @promises;
+	foreach my $res_data ($json->{content}->@*) {
+		if ($res_data->{type} eq 'text') {
+			$reply = $res_data->{text};
+		}
+		elsif ($res_data->{type} eq 'tool_use') {
+			push @promises, $self->use_tool($ctx, $res_data) // ();
+		}
+	}
+
+	my $fulfill = sub { $self->_finalize_ai_reply($ctx, $json->{stop_reason}, $reply) };
+	if (@promises) {
+		Mojo::Promise->all(@promises)->finally($fulfill);
+	}
+	else {
+		$fulfill->();
+	}
+}
+
+sub _can_use_ai ($self, $ctx)
+{
+	return $ctx->has_channel || $ctx->user_of($self->trusted_users);
+}
+
+sub get_conversation ($self, $ctx)
+{
+	my $conv = $self->conversations->{$ctx->user} //= Bot::Conversation->new(
+		personality => $self->personality,
+		history_size => $self->history_size,
+		conversation_lifetime => $self->conversation_lifetime,
+	);
+
+	$conv->clear if $conv->expired;
+	return $conv;
 }
 
 sub use_tool ($self, $ctx, $tool_data)
@@ -229,45 +284,10 @@ sub use_tool ($self, $ctx, $tool_data)
 	}
 }
 
-sub handle_command ($self, $ctx)
+sub _query ($self, $ctx)
 {
-	my $prefix = quotemeta Bot::Command->prefix;
-	if ($ctx->message =~ m{^\s*$prefix(\w+)(?: (.+))?$}) {
-		my $command = $1;
-		my @args = split /\s+/, $2 // '';
-
-		if ($self->commands->{$command}) {
-			try {
-				$ctx->set_response($self->commands->{$command}->runner($ctx, @args));
-			}
-			catch ($e) {
-				$self->log->debug($e);
-				$ctx->set_response('Command error. Usage: ' . $self->commands->{$command}->get_usage);
-			}
-		}
-		else {
-			$ctx->set_response('Unknown command');
-		}
-
-		return !!1;
-	}
-
-	return !!0;
-}
-
-sub query_bot ($self, $ctx)
-{
-	if (!$ctx->has_channel && !$ctx->user_of($self->trusted_users)) {
-		my $user = $ctx->user;
-		my $owner = $self->owner;
-		$self->log->notice("User $user got refused the private use of AI");
-		$ctx->set_response(
-			qq{I'm sorry, but your name "$user" is not allowed to use my AI in a private chat. Ask "$owner" to add you to trusted users.}
-		);
-		return;
-	}
-
-	$self->ua->post_p(
+	return Mojo::Promise->resolve if $ctx->has_response;
+	return $self->ua->post_p(
 		'https://api.anthropic.com/v1/messages',
 		{
 			'x-api-key' => $self->claude_config->{api_key},
@@ -276,7 +296,7 @@ sub query_bot ($self, $ctx)
 		json => {
 			model => $self->claude_config->{model},
 			max_tokens => 1_000,
-			system => $self->system_prompts($ctx),
+			system => $self->_system_prompts($ctx),
 			messages => $self->get_conversation($ctx)->api_call_format_messages,
 			tool_choice => {type => 'auto'},
 			tools => [
@@ -286,49 +306,64 @@ sub query_bot ($self, $ctx)
 	)->then(
 		sub ($tx) {
 			my $res = $tx->result;
-			die Dumper(['API error', $res])
-				unless $res->is_success;
-
-			my $reply;
-			my @promises;
-			foreach my $res_data ($res->json->{content}->@*) {
-				if ($res_data->{type} eq 'text') {
-					$reply = $res_data->{text};
-				}
-				elsif ($res_data->{type} eq 'tool_use') {
-					push @promises, $self->use_tool($ctx, $res_data);
-				}
+			if (!$res->is_success) {
+				$self->log->error('AI query HTTP error: ' . $res->text);
+				die {retry => !!1};
 			}
 
-			@promises = grep { defined } @promises;
-
-			my sub fulfill
-			{
-				if ($res->json->{stop_reason} eq 'tool_use') {
-					$self->query_bot($ctx);
-				}
-				else {
-					$ctx->set_response($reply);
-					$self->add_bot_response($ctx);
-				}
+			try {
+				$self->_process_query_data($ctx, $res->json);
 			}
-
-			if (@promises) {
-				Mojo::Promise->all(@promises)->finally(\&fulfill);
-			}
-			else {
-				fulfill;
+			catch ($e) {
+				$self->log->error("AI query fatal error: $e");
+				die {retry => !!0};
 			}
 		},
 		sub (@err) {
-			$self->log->error("Failed AI query: @err");
-		}
-	)->catch(
-		sub (@err) {
-			$self->log->error("AI query handler error: @err");
+			$self->log->error("AI query connection error: @err");
+			return {retry => !!0};
 		}
 	);
+}
 
-	return;
+sub add_message ($self, $ctx)
+{
+	my $msgs = $self->observed_messages->{$ctx->channel_text} //= [];
+	push @$msgs, [$ctx->user, $ctx->message];
+
+	splice @$msgs, 0, -1 * $self->history_size;
+}
+
+sub query ($self, $ctx)
+{
+	if ($self->_handle_command($ctx)) {
+		return;
+	}
+
+	$self->_add_ai_query($ctx);
+
+	if (!$self->_can_use_ai($ctx)) {
+		my $user = $ctx->user;
+		my $owner = $self->owner;
+		$self->log->info("User $user got refused the private use of AI");
+		$ctx->set_response(
+			qq{I'm sorry, but your name "$user" is not allowed to use my AI in a private chat. Ask "$owner" to add you to trusted users.}
+		);
+
+		return;
+	}
+
+	$self->requery($ctx);
+}
+
+sub requery ($self, $ctx)
+{
+	$self->_query($ctx)->then(
+		undef,
+		sub ($status) {
+			$ctx->failure($status);
+			$self->requery($ctx);
+		}
+	);
 }
 
