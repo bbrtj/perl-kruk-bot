@@ -1,6 +1,6 @@
 % layout 'default', title => 'Snippets';
 
-<p><pre><code><%= $item->snippet %></code></pre></p>
+<p><pre><code><%= $item->snippet_html %></code></pre></p>
 <p>Language: <%= $item->syntax %></p>
 <p>Expires: <%= $expiration->cdate %></p>
 
