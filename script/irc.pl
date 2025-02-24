@@ -6,7 +6,6 @@ use lib 'lib';
 
 use Env::Dot;
 use Bot;
-use Bot::Context;
 use Bot::IRC;
 
 my $bot = Bot->new(environment => 'irc');
@@ -14,7 +13,7 @@ my $irc = Bot::IRC->new;
 
 $irc->configure(
 	sub ($msg) {
-		my $ctx = Bot::Context->new($msg);
+		my $ctx = $bot->get_context($msg);
 
 		$bot->add_message($ctx);
 

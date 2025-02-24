@@ -3,14 +3,10 @@ package Bot::Conversation;
 use v5.40;
 
 use Mooish::Base;
+use Bot::Conversation::Config;
 
-has param 'personality' => (
-	isa => SimpleStr,
-	writer => 1,
-);
-
-has param 'history_size' => (
-	isa => PositiveInt,
+has param 'config' => (
+	isa => InstanceOf ['Bot::Conversation::Config'],
 );
 
 has param 'conversation_lifetime' => (
@@ -50,7 +46,7 @@ sub add_message ($self, $role, $message)
 	}
 	else {
 		push $msgs->@*, [$role, [$message]];
-		splice $msgs->@*, 0, -1 * $self->history_size * 2;
+		splice $msgs->@*, 0, -1 * $self->config->history_size * 2;
 	}
 
 	$self->_set_last_message_at(time);

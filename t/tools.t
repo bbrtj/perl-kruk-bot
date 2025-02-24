@@ -1,7 +1,6 @@
 # HARNESS-DURATION-MEDIUM
 use Test2::V0;
 use Bot;
-use Bot::Context;
 
 use v5.40;
 use utf8;
@@ -10,7 +9,7 @@ my $bot = Bot->new(environment => 'test');
 
 sub build_context ($message)
 {
-	return Bot::Context->new(
+	return $bot->get_context(
 		channel => undef,
 		user => 'test',
 		message => $message,

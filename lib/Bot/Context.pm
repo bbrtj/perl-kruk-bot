@@ -5,6 +5,7 @@ use v5.40;
 use Mooish::Base;
 use Mojo::Promise;
 use List::Util qw(any);
+use Bot::Conversation::Config;
 
 has param 'channel' => (
 	isa => Maybe [SimpleStr],
@@ -17,6 +18,12 @@ has param 'user' => (
 
 has param 'message' => (
 	isa => Str,
+	writer => 1,
+);
+
+has field 'config' => (
+	isa => InstanceOf ['Bot::Conversation::Config'],
+	writer => 1,
 );
 
 has field 'promise' => (

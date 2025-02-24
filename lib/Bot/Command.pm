@@ -10,7 +10,19 @@ has param 'bot_instance' => (
 );
 
 use constant prefix => '.';
-use constant bad_arguments => 'invalid command arguments';
+use constant bad_arguments => {hint => 'invalid command arguments'};
+use constant bad_alter_arguments => {hint => 'invalid alter command arguments'};
+use constant can_alter => !!0;
+
+sub run ($self, $ctx, @args)
+{
+	...;
+}
+
+sub alter ($self, $ctx, @args)
+{
+	...;
+}
 
 sub name ($self)
 {
@@ -24,8 +36,7 @@ sub syntax ($self)
 
 sub get_usage ($self)
 {
-	return join ' ', grep { defined && length }
-		$self->prefix . $self->name, $self->syntax;
+	$self->prefix . $self->name . '(' . $self->syntax . ')';
 }
 
 sub register ($class, $bot, %args)

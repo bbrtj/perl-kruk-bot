@@ -9,7 +9,9 @@ use Mojo::Promise;
 
 use Bot::Log;
 use Bot::Notes;
+use Bot::Context;
 use Bot::Conversation;
+use Bot::Conversation::Config;
 use all 'Bot::AITool';
 use all 'Bot::Command';
 
@@ -17,14 +19,11 @@ has param 'environment' => (
 	isa => SimpleStr,
 );
 
-has param 'personality' => (
-	isa => SimpleStr,
-	default => 'default',
-);
-
-has param 'history_size' => (
-	isa => PositiveInt,
-	default => 25,
+has param 'config' => (
+	coerce => (InstanceOf ['Bot::Conversation::Config'])->plus_coercions(
+		HashRef, q{ Bot::Conversation::Config->new($_) },
+	),
+	default => sub { {} },
 );
 
 has param 'conversation_lifetime' => (
@@ -126,11 +125,10 @@ sub _make_text_with_caching ($self, $text)
 sub _system_prompts ($self, $ctx)
 {
 	state $template = Mojo::Template->new(vars => 1);
-	my $conv = $self->get_conversation($ctx);
 	my @prompts;
 
 	push @prompts, $template->render_file(
-		"prompts/personality.@{[$conv->personality]}.ep", {
+		"prompts/personality.@{[$ctx->config->personality]}.ep", {
 			bot => $self,
 			ctx => $ctx,
 		}
@@ -169,27 +167,59 @@ sub _add_ai_response ($self, $ctx)
 sub _handle_command ($self, $ctx)
 {
 	my $prefix = quotemeta Bot::Command->prefix;
-	if ($ctx->message =~ m{^\s*$prefix(\w+)(?: (.+))?$}) {
+
+	my $msg = $ctx->message;
+	my @commands;
+
+	while ($msg =~ s{^\s*$prefix(\w+)(?:\((.+)\))?}{}) {
 		my $command = $1;
-		my @args = split /\s+/, $2 // '';
+		my @args = grep { defined } split /\s+/, $2 // '';
 
 		if ($self->commands->{$command}) {
-			try {
-				$ctx->set_response($self->commands->{$command}->runner($ctx, @args));
-			}
-			catch ($e) {
-				$self->log->debug($e);
-				$ctx->set_response('Command error. Usage: ' . $self->commands->{$command}->get_usage);
-			}
+			push @commands, [$self->commands->{$command}, \@args];
 		}
 		else {
-			$ctx->set_response('Unknown command');
+			$ctx->set_response("Unknown command $command");
+			return !!1;
 		}
-
-		return !!1;
 	}
 
-	return !!0;
+	return !!0 if !@commands;
+
+	$msg = trim($msg);
+	my $altering = length $msg > 0;
+	$ctx->set_message($msg) if $altering;
+
+	my @output;
+	foreach my $command (@commands) {
+		try {
+			if ($altering) {
+				if (!$command->[0]->can_alter) {
+					$ctx->set_response("Command @{[$command->[0]->name]} cannot alter a message");
+					return !!1;
+				}
+
+				$command->[0]->alter($ctx, $command->[1]->@*);
+			}
+			else {
+				push @output, $command->[0]->run($ctx, $command->[1]->@*);
+			}
+		}
+		catch ($e) {
+			my $hint = '';
+			if (ref $e eq 'HASH' && $e->{hint}) {
+				$hint = ": $e->{hint}";
+			}
+			else {
+				$self->log->debug($e);
+			}
+
+			$ctx->set_response("Command error$hint. Usage: " . $command->[0]->get_usage);
+		}
+	}
+
+	$ctx->set_response(join "\n", @output) if @output;
+	return $ctx->has_response;
 }
 
 sub _finalize_ai_reply ($self, $ctx, $reason, $reply)
@@ -230,11 +260,17 @@ sub _can_use_ai ($self, $ctx)
 	return $ctx->has_channel || $ctx->user_of($self->trusted_users);
 }
 
+sub get_context ($self, @params)
+{
+	my $ctx = Bot::Context->new(@params);
+	$ctx->set_config($self->get_conversation($ctx)->config->clone);
+	return $ctx;
+}
+
 sub get_conversation ($self, $ctx)
 {
 	my $conv = $self->conversations->{$ctx->user} //= Bot::Conversation->new(
-		personality => $self->personality,
-		history_size => $self->history_size,
+		config => $self->config->clone,
 		conversation_lifetime => $self->conversation_lifetime,
 	);
 
@@ -331,7 +367,7 @@ sub add_message ($self, $ctx)
 	my $msgs = $self->observed_messages->{$ctx->channel_text} //= [];
 	push @$msgs, [$ctx->user, $ctx->message];
 
-	splice @$msgs, 0, -1 * $self->history_size;
+	splice @$msgs, 0, -1 * $self->config->history_size;
 }
 
 sub query ($self, $ctx)

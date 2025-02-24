@@ -7,10 +7,10 @@ use Mooish::Base;
 extends 'Bot::Command';
 
 use constant name => 'mynotes';
-use constant syntax => '(remove <n>)';
+use constant syntax => '[remove <index>]';
 use constant description => 'check and remove bot user notes';
 
-sub runner ($self, $ctx, @args)
+sub run ($self, $ctx, @args)
 {
 	if (!$args[0]) {
 		return $self->bot_instance->notes->dump(

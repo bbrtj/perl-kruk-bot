@@ -7,10 +7,10 @@ use Mooish::Base;
 extends 'Bot::Command';
 
 use constant name => 'help';
-use constant syntax => '(<command>)';
+use constant syntax => '[<command>]';
 use constant description => 'get help about commands';
 
-sub runner ($self, $ctx, @args)
+sub run ($self, $ctx, @args)
 {
 	if (@args == 1) {
 		my $command_name = $args[0];

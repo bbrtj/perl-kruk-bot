@@ -7,10 +7,10 @@ use Mooish::Base;
 extends 'Bot::Command';
 
 use constant name => 'notes';
-use constant syntax => '(remove <n>)';
+use constant syntax => '[remove <index>]';
 use constant description => 'check and remove bot diary notes';
 
-sub runner ($self, $ctx, @args)
+sub run ($self, $ctx, @args)
 {
 	if (!$args[0]) {
 		return $self->bot_instance->notes->dump(ordered => !!1, prefix => "Here is my diary:\n") || 'My diary is empty';

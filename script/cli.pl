@@ -6,7 +6,6 @@ use lib 'lib';
 
 use Env::Dot;
 use Bot;
-use Bot::Context;
 
 binmode STDOUT, ':encoding(UTF-8)';
 binmode STDIN, ':encoding(UTF-8)';
@@ -20,7 +19,7 @@ while ('talking with AI') {
 	last unless defined $msg;
 	chomp $msg;
 
-	my $ctx = Bot::Context->new(
+	my $ctx = $bot->get_context(
 		user => $user,
 		message => $msg,
 	);
