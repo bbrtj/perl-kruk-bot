@@ -16,8 +16,9 @@ sub run ($self, $ctx, @args)
 		return $self->bot_instance->notes->dump(ordered => !!1, prefix => "Here is my diary:\n") || 'My diary is empty';
 	}
 	elsif (@args == 2 && $args[0] eq 'remove' && PositiveOrZeroInt->check($args[1])) {
-		$self->bot_instance->notes->remove(id => $args[1]);
-		return 'Diary entry removed.';
+		my $removed = $self->bot_instance->notes->remove(id => $args[1]);
+		my $fail = $removed ? '' : ' was not';
+		return "Diary entry$fail removed.";
 	}
 
 	die $self->bad_arguments;

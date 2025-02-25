@@ -20,7 +20,9 @@ sub run ($self, $ctx, @args)
 		) || 'I have no notes about you';
 	}
 	elsif (@args == 2 && $args[0] eq 'remove' && PositiveOrZeroInt->check($args[1])) {
-		$self->bot_instance->notes->remove(aspect => $ctx->user, id => $args[1]);
+		my $removed = $self->bot_instance->notes->remove(aspect => $ctx->user, id => $args[1]);
+		my $fail = $removed ? '' : ' was not';
+		return "Diary entry$fail removed.";
 		return 'Note about you removed.';
 	}
 

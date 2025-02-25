@@ -28,12 +28,12 @@ sub retrieve ($self, %args)
 
 sub remove ($self, %args)
 {
-	my $item = Bot::Schema::Note->new(
-		id => $args{id},
-		context => $args{aspect},
+	return Bot::Schema::Note::Manager->delete_notes(
+		where => [
+			id => $args{id},
+			context => $args{aspect},
+		],
 	);
-
-	return $item->delete;
 }
 
 sub dump ($self, %args)
