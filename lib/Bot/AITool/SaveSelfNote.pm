@@ -13,19 +13,14 @@ sub _build_definition ($self)
 	return {
 		name => $self->name,
 		description =>
-			q{Save a note about yourself for later (global for all users). Only save important information - will serve as your diary for later.},
+			q{Save a note about yourself for later. Only save important information - will serve as your diary for later. Don't store information about the user here.},
 		input_schema => {
 			type => 'object',
-			required => ['note', 'reason'],
+			required => ['note'],
 			properties => {
 				note => {
 					type => 'string',
 					description => 'A note about you, the chatbot',
-				},
-				reason => {
-					type => 'string',
-					enum => ['spontaneous', 'requested'],
-					description => 'Use "requested" if user asked you to remember',
 				},
 			},
 		},
@@ -34,8 +29,8 @@ sub _build_definition ($self)
 
 sub runner ($self, $ctx, $input)
 {
-	$ctx->add_to_response("noting down") if $input->{reason} eq 'requested';
-	$self->bot_instance->notes->store($input->{note}, reason => $input->{reason});
+	$ctx->add_to_response("doodling");
+	$self->bot_instance->notes->store($input->{note}, reason => 'ai');
 	return 'saved';
 }
 

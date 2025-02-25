@@ -69,7 +69,7 @@ sub add_to_response ($self, $text)
 sub full_response ($self)
 {
 	my @extras = $self->response_extras->@*;
-	@extras = map { "<$_>" } @extras;
+	@extras = map { "*$_*" } @extras;
 
 	return join ' ', @extras, $self->response;
 }

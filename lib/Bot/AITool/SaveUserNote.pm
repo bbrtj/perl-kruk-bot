@@ -16,16 +16,11 @@ sub _build_definition ($self)
 			q{Save a note about the user for later. Don't wait for user to tell you to remember something, use it if they share something that may help with conversation.},
 		input_schema => {
 			type => 'object',
-			required => ['note', 'reason'],
+			required => ['note'],
 			properties => {
 				note => {
 					type => 'string',
 					description => 'A note about the user',
-				},
-				reason => {
-					type => 'string',
-					enum => ['spontaneous', 'requested'],
-					description => 'Use "requested" if user asked you to remember',
 				},
 			},
 		},
@@ -34,8 +29,8 @@ sub _build_definition ($self)
 
 sub runner ($self, $ctx, $input)
 {
-	$ctx->add_to_response("noting down") if $input->{reason} eq 'requested';
-	$self->bot_instance->notes->store($input->{note}, aspect => $ctx->user, reason => $input->{reason});
+	$ctx->add_to_response("noting down");
+	$self->bot_instance->notes->store($input->{note}, aspect => $ctx->user, reason => 'ai');
 	return 'saved';
 }
 
