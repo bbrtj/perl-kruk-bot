@@ -4,6 +4,7 @@ use v5.40;
 
 use Mooish::Base;
 use Bot::Conversation::Config;
+use Time::Piece;
 
 has param 'config' => (
 	isa => InstanceOf ['Bot::Conversation::Config'],
@@ -14,14 +15,14 @@ has param 'conversation_lifetime' => (
 );
 
 has field 'first_message_at' => (
-	isa => PositiveInt,
-	default => sub { time },
+	isa => InstanceOf ['Time::Piece'],
+	default => sub { scalar localtime },
 	writer => -hidden,
 );
 
 has field 'last_message_at' => (
-	isa => PositiveInt,
-	default => sub { time },
+	isa => InstanceOf ['Time::Piece'],
+	default => sub { scalar localtime },
 	writer => -hidden,
 );
 
@@ -49,7 +50,7 @@ sub add_message ($self, $role, $message)
 		splice $msgs->@*, 0, -1 * $self->config->history_size * 2;
 	}
 
-	$self->_set_last_message_at(time);
+	$self->_set_last_message_at(scalar localtime);
 	return $self;
 }
 
@@ -61,8 +62,8 @@ sub expired ($self)
 sub clear ($self)
 {
 	$self->messages->@* = ();
-	$self->_set_last_message_at(time);
-	$self->_set_first_message_at(time);
+	$self->_set_last_message_at(scalar localtime);
+	$self->_set_first_message_at(scalar localtime);
 }
 
 sub api_call_format_messages ($self)

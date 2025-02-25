@@ -6,6 +6,7 @@ use Mooish::Base;
 use Mojo::Promise;
 use List::Util qw(any);
 use Bot::Conversation::Config;
+use Time::Piece;
 
 has param 'channel' => (
 	isa => Maybe [SimpleStr],
@@ -43,8 +44,8 @@ has field 'response' => (
 );
 
 has field 'timestamp' => (
-	isa => PositiveInt,
-	default => sub { time },
+	isa => InstanceOf ['Time::Piece'],
+	default => sub { scalar localtime },
 );
 
 has field 'retries' => (
