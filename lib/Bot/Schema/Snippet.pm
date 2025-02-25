@@ -3,7 +3,6 @@ package Bot::Schema::Snippet;
 use v5.40;
 
 use Data::ULID qw(ulid);
-use Mojo::Util qw(xml_escape);
 
 use parent 'Bot::Schema';
 
@@ -28,10 +27,5 @@ sub prepare_and_save ($self)
 		unless $self->created_at;
 
 	return $self->save;
-}
-
-sub snippet_html ($self)
-{
-	return xml_escape($self->snippet);
 }
 
