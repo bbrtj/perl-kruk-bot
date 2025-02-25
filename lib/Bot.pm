@@ -403,7 +403,7 @@ sub requery ($self, $ctx)
 	$self->_query($ctx)->then(
 		undef,
 		sub ($status) {
-			$ctx->failure($status);
+			$ctx->failure(%$status);
 			$self->requery($ctx);
 		}
 	);
