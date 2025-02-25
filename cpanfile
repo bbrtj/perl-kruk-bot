@@ -10,6 +10,7 @@ requires 'all';
 requires 'Data::ULID';
 requires 'Log::Dispatch';
 requires 'HTML::FormatText';
+requires 'Regexp::Common';
 
 requires 'Rose::DB::Object';
 requires 'DBD::Pg';

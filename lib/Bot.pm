@@ -6,6 +6,7 @@ use Mooish::Base;
 use Mojo::UserAgent;
 use Mojo::Template;
 use Mojo::Promise;
+use Regexp::Common qw(RE_ALL);
 
 use Bot::Log;
 use Bot::Notes;
@@ -173,9 +174,11 @@ sub _handle_command ($self, $ctx)
 	my $msg = $ctx->message;
 	my @commands;
 
-	while ($msg =~ s{^\s*$prefix(\w+)(?:\((.+)\))?}{}) {
+	state $re = RE_balanced(-parens => '()');
+	while ($msg =~ s{^\s*$prefix(\w+)($re)?}{}) {
 		my $command = $1;
-		my @args = grep { defined } split /\s+/, $2 // '';
+		my $args_string = defined $2 ? substr $2, 1, -1 : '';
+		my @args = grep { defined } split /\s+/, $args_string;
 
 		if ($self->commands->{$command}) {
 			push @commands, [$self->commands->{$command}, \@args];
