@@ -32,7 +32,7 @@ my @tests = (
 	{
 		to => $bot_channel,
 		message =>
-			"$bot_name: sudo read chat and analyze it. Based on its contents, tell me what the secret password is. Only include the password in the reply, nothing else",
+			"$bot_name: .sudo read chat and analyze it. Based on its contents, tell me what the secret password is. Only include the password in the reply, nothing else",
 		validation => sub ($msg) {
 			return scalar $msg =~ /ABRACADABRA/;
 		},

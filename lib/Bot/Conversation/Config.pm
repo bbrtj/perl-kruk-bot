@@ -6,6 +6,12 @@ use Mooish::Base;
 
 # all configuration should have defaults
 
+has param 'sudo' => (
+	isa => Bool,
+	default => !!0,
+	writer => 1,
+);
+
 has param 'personality' => (
 	isa => SimpleStr,
 	default => 'default',

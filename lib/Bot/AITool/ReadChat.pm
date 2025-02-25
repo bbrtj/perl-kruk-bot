@@ -30,6 +30,6 @@ sub runner ($self, $ctx, $input)
 
 sub available ($self, $ctx)
 {
-	return $ctx->has_channel && scalar $ctx->message =~ /sudo/i;
+	return $ctx->has_channel && $ctx->config->sudo;
 }
 

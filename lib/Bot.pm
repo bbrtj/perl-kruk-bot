@@ -85,6 +85,7 @@ has field 'commands' => (
 			Bot::Command::Notes->register($self),
 			Bot::Command::Personality->register($self),
 			Bot::Command::Chat->register($self),
+			Bot::Command::Sudo->register($self),
 		};
 	},
 );
