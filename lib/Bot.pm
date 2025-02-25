@@ -44,14 +44,15 @@ has param 'trusted_users' => (
 	}
 );
 
-has field 'claude_config' => (
-	isa => HashRef,
+has param 'min_cache_length' => (
+	isa => PositiveOrZeroInt,
+	default => 8000,
+);
+
+has field 'claude_api_key' => (
+	isa => Maybe [SimpleStr],
 	default => sub {
-		return {
-			api_key => $ENV{KRUK_CLAUDE_API_KEY},
-			model => $ENV{KRUK_CLAUDE_MODEL},
-			cache_length => $ENV{KRUK_CLAUDE_CACHE_LENGTH} // 4000,
-		};
+		$ENV{KRUK_CLAUDE_API_KEY};
 	},
 );
 
@@ -114,7 +115,7 @@ has field 'log' => (
 
 sub _make_text_with_caching ($self, $text)
 {
-	my $should_cache = length $text > $self->claude_config->{cache_length};
+	my $should_cache = length $text > $self->min_cache_length;
 	$self->log->debug('Requesting caching of text: ' . (length $text) . ' characters')
 		if $should_cache;
 
@@ -129,11 +130,14 @@ sub _system_prompts ($self, $ctx)
 {
 	state $template = Mojo::Template->new(vars => 1);
 	my @prompts;
+	my %params;
+	my $set_param = sub ($key, $value) { $params{$key} = $value };
 
 	push @prompts, $template->render_file(
 		"prompts/personality.@{[$ctx->config->personality]}.ep", {
 			bot => $self,
 			ctx => $ctx,
+			set_param => $set_param,
 		}
 	);
 
@@ -142,6 +146,7 @@ sub _system_prompts ($self, $ctx)
 			"prompts/environment.@{[$self->environment]}.ep", {
 				bot => $self,
 				ctx => $ctx,
+				set_param => $set_param,
 			}
 		);
 	}
@@ -154,7 +159,8 @@ sub _system_prompts ($self, $ctx)
 		$self->notes->dump(aspect => $ctx->user, prefix => 'Here are your notes about the user:');
 
 	@prompts = map { $self->_make_text_with_caching($_) } @prompts;
-	return \@prompts;
+	$params{system} = \@prompts;
+	return %params;
 }
 
 sub _add_ai_query ($self, $ctx)
@@ -262,7 +268,7 @@ sub _process_query_data ($self, $ctx, $json)
 
 sub _can_use_ai ($self, $ctx)
 {
-	return $ctx->has_channel || $ctx->user_of($self->trusted_users);
+	return defined $self->claude_api_key && ($ctx->has_channel || $ctx->user_of($self->trusted_users));
 }
 
 sub get_context ($self, @params)
@@ -331,13 +337,12 @@ sub _query ($self, $ctx)
 	return $self->ua->post_p(
 		'https://api.anthropic.com/v1/messages',
 		{
-			'x-api-key' => $self->claude_config->{api_key},
+			'x-api-key' => $self->claude_api_key,
 			'anthropic-version' => '2023-06-01',
 		},
 		json => {
-			model => $self->claude_config->{model},
+			$self->_system_prompts($ctx),
 			max_tokens => 1_000,
-			system => $self->_system_prompts($ctx),
 			messages => $self->get_conversation($ctx)->api_call_format_messages,
 			tool_choice => {type => 'auto'},
 			tools => [
@@ -384,12 +389,8 @@ sub query ($self, $ctx)
 	$self->_add_ai_query($ctx);
 
 	if (!$self->_can_use_ai($ctx)) {
-		my $user = $ctx->user;
-		my $owner = $self->owner;
-		$self->log->info("User $user got refused the private use of AI");
-		$ctx->set_response(
-			qq{I'm sorry, but your name "$user" is not allowed to use my AI in a private chat. Ask "$owner" to add you to trusted users.}
-		);
+		$self->log->info("User @{[$ctx->user]} got refused the use of AI");
+		$ctx->set_response("I'm sorry, but you are not allowed to use my AI.");
 
 		return;
 	}
