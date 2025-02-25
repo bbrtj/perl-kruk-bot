@@ -9,7 +9,7 @@ extends 'Bot::Command';
 
 use constant name => 'personality';
 use constant syntax => '[<name>]';
-use constant description => 'show and modify bot personalities (for you). Alters a message';
+use constant description => 'show and modify bot personalities (for you)';
 use constant can_alter => !!1;
 
 sub run ($self, $ctx, @args)

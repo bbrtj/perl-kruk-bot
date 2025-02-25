@@ -18,7 +18,7 @@ sub run ($self, $ctx, @args)
 		return "No such command: $command_name" unless $command;
 
 		my $usage = $command->get_usage;
-		my $descr = $command->description;
+		my $descr = $command->get_full_description;
 		return "Command usage: $usage, $descr";
 	}
 	elsif (@args == 0) {

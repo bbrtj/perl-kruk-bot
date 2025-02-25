@@ -29,6 +29,11 @@ sub name ($self)
 	...;
 }
 
+sub description ($self)
+{
+	...;
+}
+
 sub syntax ($self)
 {
 	...;
@@ -37,6 +42,11 @@ sub syntax ($self)
 sub get_usage ($self)
 {
 	$self->prefix . $self->name . '(' . $self->syntax . ')';
+}
+
+sub get_full_description ($self)
+{
+	return $self->description . ($self->can_alter ? ' (can alter a message)' : '');
 }
 
 sub register ($class, $bot, %args)
