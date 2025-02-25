@@ -5,4 +5,6 @@ prompts/personality.*.ep
 local
 *.db
 *.log
+tools/*
+!tools/.gitkeep
 
