@@ -16,7 +16,7 @@ sub run ($self, $ctx, @args)
 {
 	if (!$args[0]) {
 		return
-			qq{You are currently talking with "@{[$self->current($ctx)]}" bot. Other possible options are: @{[join ', ', $self->list]}};
+			qq{You are currently talking with "@{[$self->current($ctx)]}" bot. Possible options are: @{[join ', ', $self->list]}};
 	}
 	elsif ($self->check_switch(@args)) {
 		$self->switch($ctx, $args[0]);
@@ -40,7 +40,7 @@ sub list ($self)
 
 sub current ($self, $ctx)
 {
-	return $self->bot_instance->get_conversation($ctx)->config->personality;
+	return $ctx->config->personality;
 }
 
 sub check_switch ($self, @args)
@@ -52,10 +52,8 @@ sub switch ($self, $ctx, $personality, $alter = !!0)
 {
 	die {hint => 'no such personality'} unless any { $personality eq $_ } $self->list;
 
-	if ($alter) {
-		$ctx->config->set_personality($personality);
-	}
-	else {
+	$ctx->config->set_personality($personality);
+	if (!$alter) {
 		$self->bot_instance->get_conversation($ctx)->config->set_personality($personality);
 	}
 }

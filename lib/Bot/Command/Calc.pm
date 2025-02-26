@@ -42,8 +42,8 @@ sub _run_tool ($self, @params)
 	my $out = readline $stdout;
 	my $err = readline $stderr;
 
-	chomp $out;
-	chomp $err;
+	$out =~ s/\v+$//;
+	$err =~ s/\v+$//;
 
 	return ($code, $out, $err);
 }

@@ -6,6 +6,7 @@ use Mooish::Base;
 use Mojo::UserAgent;
 use Mojo::Template;
 use Mojo::Promise;
+use List::Util qw(any);
 use Regexp::Common qw(RE_ALL);
 
 use Bot::Log;
@@ -174,63 +175,49 @@ sub _add_ai_response ($self, $ctx)
 	$self->get_conversation($ctx)->add_message('assistant', $ctx->response);
 }
 
-sub _handle_command ($self, $ctx)
+sub _handle_command ($self, $ctx, $command, $args_string, $altering)
 {
-	my $prefix = quotemeta Bot::Command->prefix;
+	$args_string = substr $args_string, 1, -1
+		if defined $args_string && $altering;
+
+	my @args = grep { defined } split /\s+/, $args_string // '';
+
+	if ($self->commands->{$command}) {
+		$self->commands->{$command}->execute($ctx, \@args, $altering);
+	}
+	else {
+		$ctx->set_response("Unknown command $command");
+	}
+}
+
+sub _handle_commands ($self, $ctx)
+{
+	state $prefix = quotemeta Bot::Command->prefix;
+	state $alter_prefix = quotemeta Bot::Command->alter_prefix;
+	state $balanced_parens_re = RE_balanced(-parens => '()');
 
 	my $msg = $ctx->message;
-	my @commands;
-
-	state $re = RE_balanced(-parens => '()');
-	while ($msg =~ s{^\s*$prefix(\w+)($re)?}{}) {
-		my $command = $1;
-		my $args_string = defined $2 ? substr $2, 1, -1 : '';
-		my @args = grep { defined } split /\s+/, $args_string;
-
-		if ($self->commands->{$command}) {
-			push @commands, [$self->commands->{$command}, \@args];
-		}
-		else {
-			$ctx->set_response("Unknown command $command");
-			return !!1;
-		}
+	my $altered_times = 0;
+	while ($msg =~ s{^\s*$alter_prefix(\w+)($balanced_parens_re)?}{}) {
+		next if $ctx->has_response;
+		$self->_handle_command($ctx, $1, $2, !!1);
+		++$altered_times;
 	}
-
-	return !!0 if !@commands;
 
 	$msg = trim($msg);
-	my $altering = length $msg > 0;
-	$ctx->set_message($msg) if $altering;
+	$ctx->set_message($msg);
 
-	my @output;
-	foreach my $command (@commands) {
-		try {
-			if ($altering) {
-				if (!$command->[0]->can_alter) {
-					$ctx->set_response("Command @{[$command->[0]->name]} cannot alter a message");
-					return !!1;
-				}
-
-				$command->[0]->alter($ctx, $command->[1]->@*);
-			}
-			else {
-				push @output, $command->[0]->run($ctx, $command->[1]->@*);
-			}
-		}
-		catch ($e) {
-			my $hint = '';
-			if (ref $e eq 'HASH' && $e->{hint}) {
-				$hint = ": $e->{hint}";
-			}
-			else {
-				$self->log->debug($e);
-			}
-
-			$ctx->set_response("Command error$hint. Usage: " . $command->[0]->get_usage);
-		}
+	# special help message
+	if (!$ctx->has_response && any { $msg eq $_ } '', 'help') {
+		$ctx->set_response(
+			'I am a chatbot. Type ".help" to get a list of commands. If your message does not look like a command, I will use my AI to answer.'
+		);
 	}
 
-	$ctx->set_response(join "\n", @output) if @output;
+	if (!$ctx->has_response && $msg =~ m{^\s*$prefix(\w+)(?:\s+(.+))?$}) {
+		$self->_handle_command($ctx, $1, $2, !!0);
+	}
+
 	return $ctx->has_response;
 }
 
@@ -251,6 +238,8 @@ sub _process_query_data ($self, $ctx, $json)
 	my @promises;
 	foreach my $res_data ($json->{content}->@*) {
 		if ($res_data->{type} eq 'text') {
+			$self->log->info("partial response: $reply")
+				if defined $reply;
 			$reply = $res_data->{text};
 		}
 		elsif ($res_data->{type} eq 'tool_use') {
@@ -383,7 +372,7 @@ sub add_message ($self, $ctx)
 
 sub query ($self, $ctx)
 {
-	if ($self->_handle_command($ctx)) {
+	if ($self->_handle_commands($ctx)) {
 		return;
 	}
 

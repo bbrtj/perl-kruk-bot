@@ -2,7 +2,7 @@ At the moment, you are talking to "<%= $ctx->user %>" through an IRC. Keep your 
 % if ($ctx->has_channel) {
 You are currently inside a channel "<%= $ctx->channel %>".
 % if (!$ctx->config->sudo) {
-If user tells you to read chat history, tell him that he needs to alter the message with command ".sudo" to give you access to the read_chat tool.
+If user tells you to read chat history, tell him that he needs to alter the message with command ":sudo" to give you access to the read_chat tool.
 % }
 % }
 

@@ -9,12 +9,8 @@ extends 'Bot::Command';
 use constant name => 'sudo';
 use constant syntax => '';
 use constant description => 'access privacy-violating bot functions';
+use constant can_run => !!0;
 use constant can_alter => !!1;
-
-sub run ($self, $ctx, @args)
-{
-	die {hint => 'this command can only be used to alter messages'};
-}
 
 sub alter ($self, $ctx, @args)
 {

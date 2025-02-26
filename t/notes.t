@@ -44,7 +44,7 @@ subtest 'should fetch diary' => sub {
 
 subtest 'should not remove my notes via diary' => sub {
 	my $id = $usernote->id;
-	my $ctx = build_context(".notes(remove $id)");
+	my $ctx = build_context(".notes remove $id");
 	$bot->query($ctx);
 	$ctx->promise->finally(
 		sub {
@@ -66,7 +66,7 @@ subtest 'should fetch my notes' => sub {
 
 subtest 'should not remove diary via my notes' => sub {
 	my $id = $botnote->id;
-	my $ctx = build_context(".mynotes(remove $id)");
+	my $ctx = build_context(".mynotes remove $id");
 	$bot->query($ctx);
 	$ctx->promise->finally(
 		sub {
@@ -77,7 +77,7 @@ subtest 'should not remove diary via my notes' => sub {
 
 subtest 'should remove my notes' => sub {
 	my $id = $usernote->id;
-	my $ctx = build_context(".mynotes(remove $id)");
+	my $ctx = build_context(".mynotes remove $id");
 	$bot->query($ctx);
 	$ctx->promise->finally(
 		sub {
@@ -88,7 +88,7 @@ subtest 'should remove my notes' => sub {
 
 subtest 'should remove diary' => sub {
 	my $id = $botnote->id;
-	my $ctx = build_context(".notes(remove $id)");
+	my $ctx = build_context(".notes remove $id");
 	$bot->query($ctx);
 	$ctx->promise->finally(
 		sub {

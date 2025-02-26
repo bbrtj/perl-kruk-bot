@@ -26,9 +26,12 @@ sub run ($self, $ctx, @args)
 			sort map { $_->name }
 			values $self->bot_instance->commands->%*;
 
+		my $prefix = $self->prefix;
+		my $alter_prefix = $self->alter_prefix;
 		my $usage = $self->get_usage;
 
-		return "Available commands are: $commands. Type $usage with command name for more info";
+		return
+			qq{Commands are prefixed by "$prefix". Some commands may alter a message when prefixed with "$alter_prefix". Available commands are: $commands. Type $prefix$usage with command name for more info};
 	}
 
 	die $self->bad_arguments;
