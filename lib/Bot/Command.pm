@@ -13,6 +13,7 @@ use constant prefix => '.';
 use constant bad_arguments => {hint => 'invalid command arguments'};
 use constant bad_alter_arguments => {hint => 'invalid alter command arguments'};
 use constant can_alter => !!0;
+use constant available => !!1;
 
 sub run ($self, $ctx, @args)
 {
@@ -51,6 +52,8 @@ sub get_full_description ($self)
 
 sub register ($class, $bot, %args)
 {
-	return ($class->name => $class->new(%args, bot_instance => $bot));
+	my $self = $class->new(%args, bot_instance => $bot);
+
+	return $self->available ? ($class->name => $self) : ();
 }
 

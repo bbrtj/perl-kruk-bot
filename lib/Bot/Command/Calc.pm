@@ -21,13 +21,20 @@ sub description ($self)
 		return $desc;
 	}
 
+	# remove usage up to the operators part
+	$out =~ s/^.+?operators://si;
 	return "$desc: ```$out```";
 }
 
-# cli tool compiled from https://github.com/bbrtj/pascal-pn
+sub available ($self)
+{
+	return -x 'tools/calc';
+}
+
+# calc tool compiled from https://github.com/bbrtj/pascal-pn
 sub _run_tool ($self, @params)
 {
-	my $pid = open3(undef, my $stdout, my $stderr = gensym, 'tools/cli', @params);
+	my $pid = open3(undef, my $stdout, my $stderr = gensym, 'tools/calc', @params);
 	waitpid $pid, 0;
 	my $code = $? >> 8;
 
