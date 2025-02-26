@@ -5,22 +5,23 @@ use v5.40;
 use Mooish::Base;
 use List::Util qw(any);
 
+use Bot::I18N;
+
 extends 'Bot::Command';
 
 use constant name => 'personality';
-use constant syntax => '[<name>]';
-use constant description => 'show and modify bot personalities (for you)';
+use constant syntax => _t 'command.personality.help.syntax';
+use constant description => _t 'command.personality.help.description';
 use constant can_alter => !!1;
 
 sub run ($self, $ctx, @args)
 {
 	if (!$args[0]) {
-		return
-			qq{You are currently talking with "@{[$self->current($ctx)]}" bot. Possible options are: @{[join ', ', $self->list]}};
+		return _t 'command.personality.msg.info', $self->current($ctx), join ', ', $self->list;
 	}
 	elsif ($self->check_switch(@args)) {
 		$self->switch($ctx, $args[0]);
-		return 'Personality modified';
+		return _t 'command.personality.msg.modified';
 	}
 
 	die $self->bad_arguments;
@@ -50,7 +51,7 @@ sub check_switch ($self, @args)
 
 sub switch ($self, $ctx, $personality, $alter = !!0)
 {
-	die {hint => 'no such personality'} unless any { $personality eq $_ } $self->list;
+	die {hint => _t 'command.personality.err.invalid'} unless any { $personality eq $_ } $self->list;
 
 	$ctx->config->set_personality($personality);
 	if (!$alter) {

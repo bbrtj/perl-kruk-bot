@@ -4,11 +4,13 @@ use v5.40;
 
 use Mooish::Base;
 
+use Bot::I18N;
+
 extends 'Bot::Command';
 
 use constant name => 'mynotes';
-use constant syntax => '[remove <index>]';
-use constant description => 'check and remove bot user notes';
+use constant syntax => _t 'command.mynotes.help.syntax';
+use constant description => _t 'command.mynotes.help.description';
 
 sub run ($self, $ctx, @args)
 {
@@ -16,14 +18,16 @@ sub run ($self, $ctx, @args)
 		return $self->bot_instance->notes->dump(
 			aspect => $ctx->user,
 			ordered => !!1,
-			prefix => "Here are my notes about you:\n"
-		) || 'I have no notes about you';
+			prefix => _t 'command.mynotes.msg.list_prefix'
+		) || _t 'command.mynotes.msg.no_notes';
 	}
 	elsif (@args == 2 && $args[0] eq 'remove' && PositiveOrZeroInt->check($args[1])) {
 		my $removed = $self->bot_instance->notes->remove(aspect => $ctx->user, id => $args[1]);
-		my $fail = $removed ? '' : ' was not';
-		return "Diary entry$fail removed.";
-		return 'Note about you removed.';
+
+		return $removed
+			? _t 'command.mynotes.msg.removed'
+			: _t 'command.mynotes.msg.not_removed'
+			;
 	}
 
 	die $self->bad_arguments;

@@ -5,8 +5,10 @@ use v5.40;
 use Mooish::Base;
 use Mojo::Promise;
 use List::Util qw(any);
-use Bot::Conversation::Config;
 use Time::Piece;
+
+use Bot::I18N;
+use Bot::Conversation::Config;
 
 has param 'channel' => (
 	isa => Maybe [SimpleStr],
@@ -93,14 +95,14 @@ sub user_of ($self, $users_aref)
 sub failure ($self, %params)
 {
 	if (!$params{retry}) {
-		$self->set_response("AI fatal failure, did not get a response");
+		$self->set_response(_t 'err.no_response');
 		return;
 	}
 
 	$params{max_tries} //= 3;
 	my $retries = $self->retries;
 	$self->_set_retries(++$retries);
-	$self->set_response("AI failure: tried $params{max_tries} times but did not get a response")
+	$self->set_response(_t 'err.no_ai_response', $params{max_tries})
 		if $retries >= $params{max_tries};
 }
 

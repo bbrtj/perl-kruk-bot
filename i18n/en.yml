@@ -1,0 +1,169 @@
+---
+id: help
+str: I am a chatbot. Type "%shelp" to get a list of commands. If your message does not look like a command, I will use my AI to answer.
+---
+id: err.unknown_command
+str: Unknown command "%s".
+---
+id: err.ai_use_refused
+str: I'm sorry, but you are not allowed to use my AI.
+---
+id: err.no_response
+str: 'System failure: did not get a response.'
+---
+id: err.no_ai_response
+str: 'AI failure: tried %s times but did not get a response.'
+
+# fetch_webpage tool
+---
+id: tool.fetch_webpage.msg.info
+str: fetching %s - %s
+---
+id: tool.fetch_webpage.err.failed
+str: fetching %s - failed
+
+# read_chat tool
+---
+id: tool.read_chat.msg.info
+str: reading chat
+
+# save_self_note tool
+---
+id: tool.save_self_note.msg.info
+str: doodling
+
+# save_user_note tool
+---
+id: tool.save_self_note.msg.info
+str: noting down
+
+# General commands
+---
+id: command.general.err.bad_arguments
+str: invalid command arguments
+---
+id: command.general.err.bad_alter_arguments
+str: invalid alter command arguments
+---
+id: command.general.err.cant_alter
+str: Command %s cannot alter a message
+---
+id: command.general.err.must_alter
+str: Command %s must alter a message
+---
+id: command.general.err.full_error
+str: 'Command error. Usage: %s'
+---
+id: command.general.err.full_error_with_hint
+str: 'Command error: %s. Usage: %s'
+---
+id: command.general.help.can_alter
+str: ' (can alter a message)'
+---
+id: command.general.help.must_alter
+str: ' (must alter a message)'
+
+# calc command
+---
+id: command.calc.help.syntax
+str: [<expression>]
+---
+id: command.calc.help.description
+str: evaluate a mathematical expression
+---
+id: command.calc.help.description_with_syntax
+str: 'evaluate a mathematical expression. Syntax: ```%s```'
+
+# chat command
+---
+id: command.chat.help.syntax
+str: [clear]
+---
+id: command.chat.help.description
+str: show or modify details about your chat
+---
+id: command.chat.msg.cleared
+str: Chat cleared
+---
+id: command.chat.msg.info
+str: Your current conversation has started %s and has %s messages in it.
+
+# help command
+---
+id: command.help.help.syntax
+str: [<command>]
+---
+id: command.help.help.description
+str: get help about commands
+---
+id: command.help.msg.usage
+str: 'Command usage: %s, %s'
+---
+id: command.help.msg.no_command
+str: 'No such command: %s'
+---
+id: command.help.msg.info
+str: 'Commands are prefixed by "%s". Some commands may alter a message when prefixed with "%s". Available commands are: %s. Type %1$s%s with command name for more info'
+
+# mynotes command
+---
+id: command.mynotes.help.syntax
+str: [remove <index>]
+---
+id: command.mynotes.help.description
+str: check and remove bot user notes
+---
+id: command.mynotes.msg.list_prefix
+str: 'Here are my notes about you:'
+---
+id: command.mynotes.msg.no_notes
+str: I have no notes about you
+---
+id: command.mynotes.msg.removed
+str: Note about you removed.
+---
+id: command.mynotes.msg.not_removed
+str: Note about you was not removed.
+
+# notes command
+---
+id: command.notes.help.syntax
+str: [remove <index>]
+---
+id: command.notes.help.description
+str: check and remove bot diary notes
+---
+id: command.notes.msg.list_prefix
+str: 'Here is my diary:'
+---
+id: command.notes.msg.no_notes
+str: My diary is empty
+---
+id: command.notes.msg.removed
+str: Diary entry removed.
+---
+id: command.notes.msg.not_removed
+str: Diary entry was not removed.
+
+# personality command
+---
+id: command.personality.help.syntax
+str: [<name>]
+---
+id: command.personality.help.description
+str: show and modify bot personalities (for you)
+---
+id: command.personality.msg.info
+str: 'You are currently talking with "%s" bot. Possible options are: %s'
+---
+id: command.personality.msg.modified
+str: Personality modified
+---
+id: command.personality.err.invalid
+str: no such personality
+
+# sudo command
+---
+id: command.sudo.help.description
+str: access privacy-violating bot functions
+

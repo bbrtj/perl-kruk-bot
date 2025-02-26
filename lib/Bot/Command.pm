@@ -3,6 +3,7 @@ package Bot::Command;
 use v5.40;
 
 use Mooish::Base;
+use Bot::I18N;
 
 has param 'bot_instance' => (
 	isa => InstanceOf ['Bot'],
@@ -11,8 +12,8 @@ has param 'bot_instance' => (
 
 use constant prefix => '.';
 use constant alter_prefix => ':';
-use constant bad_arguments => {hint => 'invalid command arguments'};
-use constant bad_alter_arguments => {hint => 'invalid alter command arguments'};
+use constant bad_arguments => {hint => _t 'command.general.err.bad_arguments'};
+use constant bad_alter_arguments => {hint => _t 'command.general.err.bad_alter_arguments'};
 use constant can_run => !!1;
 use constant can_alter => !!0;
 use constant available => !!1;
@@ -50,7 +51,7 @@ sub get_usage ($self)
 sub get_full_description ($self)
 {
 	my $alter = '';
-	$alter = ' (' . ($self->can_run ? 'can' : 'must') . ' alter a message)'
+	$alter = _t $self->can_run ? 'command.general.help.can_alter' : 'command.general.help.must_alter'
 		if $self->can_alter;
 
 	return $self->description . $alter;
@@ -68,7 +69,7 @@ sub execute ($self, $ctx, $args, $altering)
 	try {
 		if ($altering) {
 			if (!$self->can_alter) {
-				$ctx->set_response("Command @{[$self->name]} cannot alter a message");
+				$ctx->set_response(_t 'command.general.err.cant_alter', $self->name);
 				return;
 			}
 
@@ -76,7 +77,7 @@ sub execute ($self, $ctx, $args, $altering)
 		}
 		else {
 			if (!$self->can_run) {
-				$ctx->set_response("Command @{[$self->name]} must alter a message");
+				$ctx->set_response(_t 'command.general.err.must_alter', $self->name);
 				return;
 			}
 
@@ -86,15 +87,19 @@ sub execute ($self, $ctx, $args, $altering)
 		}
 	}
 	catch ($e) {
-		my $hint = '';
+		my $hint;
 		if (ref $e eq 'HASH' && $e->{hint}) {
-			$hint = ": $e->{hint}";
+			$hint = $e->{hint};
 		}
 		else {
 			$self->bot_instance->log->debug($e);
 		}
 
-		$ctx->set_response("Command error$hint. Usage: " . $self->get_usage);
+		$ctx->set_response(
+			$hint
+			? _t 'command.general.err.full_error_with_hint', $hint, $self->get_usage
+			: _t 'command.general.err.full_error', $self->get_usage
+		);
 	}
 }
 

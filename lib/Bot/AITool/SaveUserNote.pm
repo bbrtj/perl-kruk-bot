@@ -4,6 +4,8 @@ use v5.40;
 
 use Mooish::Base;
 
+use Bot::I18N;
+
 extends 'Bot::AITool';
 
 use constant name => 'save_user_note';
@@ -29,7 +31,7 @@ sub _build_definition ($self)
 
 sub runner ($self, $ctx, $input)
 {
-	$ctx->add_to_response("noting down");
+	$ctx->add_to_response(_t 'tool.save_user_note.msg.info');
 	$self->bot_instance->notes->store($input->{note}, aspect => $ctx->user, reason => 'ai');
 	return 'saved';
 }

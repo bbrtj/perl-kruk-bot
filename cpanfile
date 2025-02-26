@@ -16,6 +16,9 @@ requires 'Rose::DB::Object';
 requires 'DBD::Pg';
 requires 'DBD::SQLite';
 
+requires 'Data::Localize';
+requires 'Data::Localize::YAML';
+
 on test => sub {
 	requires 'Test2::V0';
 };

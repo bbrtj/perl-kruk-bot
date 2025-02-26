@@ -9,6 +9,8 @@ use HTML::FormatText;
 use Encode qw(decode);
 use List::Util qw(any);
 
+use Bot::I18N;
+
 # needed for HTML::Element to find these in look_down
 $HTML::Tagset::isBodyElement{nav} = 1;
 $HTML::Tagset::isBodyElement{header} = 1;
@@ -54,7 +56,7 @@ sub runner ($self, $ctx, $input)
 	return $self->ua->get_p($url)->then(
 		sub ($tx) {
 			my $res = $tx->result;
-			$ctx->add_to_response("fetching $url - " . $res->code);
+			$ctx->add_to_response(_t 'tool.fetch_webpage.msg.info', $url, $res->code);
 			my $content_type = $res->headers->content_type // '';
 			my $body = $res->text;
 
@@ -83,7 +85,7 @@ sub runner ($self, $ctx, $input)
 			return $body;
 		},
 		sub ($err) {
-			$ctx->add_to_response("fetching $url - failed");
+			$ctx->add_to_response(_t 'tool.fetch_webpage.err.failed', $url);
 			return "Error fetching webpage: $err";
 		}
 	);

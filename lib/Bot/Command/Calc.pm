@@ -6,24 +6,26 @@ use Mooish::Base;
 use IPC::Open3;
 use Symbol qw(gensym);
 
+use Bot::I18N;
+
 extends 'Bot::Command';
 
 use constant name => 'calc';
-use constant syntax => '[<expression>]';
+use constant syntax => _t 'command.calc.help.syntax';
 
 sub description ($self)
 {
 	my ($code, $out, $err) = $self->_run_tool('--help');
-	my $desc = 'evaluate a mathematical expression';
 
 	if ($code != 0) {
 		$self->bot_instance->log->debug($err);
-		return $desc;
+		return _t 'command.calc.help.description';
 	}
-
-	# remove usage up to the operators part
-	$out =~ s/^.+?operators://si;
-	return "$desc: ```$out```";
+	else {
+		# remove usage up to the operators part
+		$out =~ s/^.+?operators://si;
+		return _t 'command.calc.help.description_with_syntax', $out;
+	}
 }
 
 sub available ($self)

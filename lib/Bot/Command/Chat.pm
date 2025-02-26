@@ -3,26 +3,25 @@ package Bot::Command::Chat;
 use v5.40;
 
 use Mooish::Base;
-use List::Util qw(any);
+
+use Bot::I18N;
 
 extends 'Bot::Command';
 
 use constant name => 'chat';
-use constant syntax => '[clear]';
-use constant description => 'show or modify details about your chat';
+use constant syntax => _t 'command.chat.help.syntax';
+use constant description => _t 'command.chat.help.description';
 use constant can_alter => !!1;
 
 sub run ($self, $ctx, @args)
 {
 	if (!$args[0]) {
 		my $conv = $self->bot_instance->get_conversation($ctx);
-		return
-			qq{Your current conversation has started @{[$conv->first_message_at->cdate]}}
-			. qq{ and has @{[scalar $conv->messages->@*]} messages in it. };
+		return _t 'command.chat.msg.info', $conv->first_message_at->cdate, scalar $conv->messages->@*;
 	}
 	elsif ($self->check_clear(@args)) {
 		$self->clear($ctx);
-		return 'Chat cleared';
+		return _t 'command.chat.msg.cleared';
 	}
 
 	die $self->bad_arguments;

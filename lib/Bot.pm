@@ -9,6 +9,7 @@ use Mojo::Promise;
 use List::Util qw(any);
 use Regexp::Common qw(RE_ALL);
 
+use Bot::I18N;
 use Bot::Log;
 use Bot::Notes;
 use Bot::Context;
@@ -111,7 +112,7 @@ has field 'ua' => (
 has field 'log' => (
 	isa => InstanceOf ['Bot::Log'],
 	default => sub {
-		Bot::Log->new(filename => 'bot.log');
+		Bot::Log->singleton;
 	},
 );
 
@@ -186,7 +187,7 @@ sub _handle_command ($self, $ctx, $command, $args_string, $altering)
 		$self->commands->{$command}->execute($ctx, \@args, $altering);
 	}
 	else {
-		$ctx->set_response("Unknown command $command");
+		$ctx->set_response(_t 'err.unknown_command', $command);
 	}
 }
 
@@ -209,9 +210,7 @@ sub _handle_commands ($self, $ctx)
 
 	# special help message
 	if (!$ctx->has_response && any { $msg eq $_ } '', 'help') {
-		$ctx->set_response(
-			'I am a chatbot. Type ".help" to get a list of commands. If your message does not look like a command, I will use my AI to answer.'
-		);
+		$ctx->set_response(_t 'help', Bot::Command->prefix);
 	}
 
 	if (!$ctx->has_response && $msg =~ m{^\s*$prefix(\w+)(?:\s+(.+))?$}) {
@@ -380,7 +379,7 @@ sub query ($self, $ctx)
 
 	if (!$self->_can_use_ai($ctx)) {
 		$self->log->info("User @{[$ctx->user]} got refused the use of AI");
-		$ctx->set_response("I'm sorry, but you are not allowed to use my AI.");
+		$ctx->set_response(_t 'err.ai_use_refused');
 
 		return;
 	}

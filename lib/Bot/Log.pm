@@ -18,6 +18,12 @@ has option 'filename' => (
 	isa => Str,
 );
 
+sub singleton ($class)
+{
+	state $self = Bot::Log->new(filename => 'bot.log');
+	return $self;
+}
+
 sub _get_log_callback ($self)
 {
 	return sub (%params) {
