@@ -18,6 +18,7 @@ requires 'DBD::SQLite';
 
 requires 'Data::Localize';
 requires 'Data::Localize::YAML';
+requires 'Data::Localize::Format::Sprintf';
 
 on test => sub {
 	requires 'Test2::V0';

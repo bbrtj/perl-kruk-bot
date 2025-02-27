@@ -293,6 +293,14 @@ DISTRIBUTIONS
       Test::More 0.94
       Test::Requires 0
       perl 5.008
+  Data-Localize-Format-Sprintf-0.001
+    pathname: B/BR/BRTASTIC/Data-Localize-Format-Sprintf-0.001.tar.gz
+    provides:
+      Data::Localize::Format::Sprintf 0.001
+    requirements:
+      Data::Localize 0
+      ExtUtils::MakeMaker 0
+      perl 5.008
   Data-Localize-YAML-0.001
     pathname: B/BR/BRTASTIC/Data-Localize-YAML-0.001.tar.gz
     provides:
