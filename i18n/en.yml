@@ -46,16 +46,13 @@ id: command.general.err.bad_alter_arguments
 str: 'invalid alter command arguments'
 ---
 id: command.general.err.cant_alter
-str: 'Command [_1] cannot alter a message'
+str: 'Command [_1] cannot alter a message.'
 ---
 id: command.general.err.must_alter
-str: 'Command [_1] must alter a message'
+str: 'Command [_1] must alter a message.'
 ---
 id: command.general.err.full_error
-str: 'Command error. Usage: [_1]'
----
-id: command.general.err.full_error_with_hint
-str: 'Command error: [_1]. Usage: [_2]'
+str: 'Command error[prepend_if_exists,_1,: ]. Usage: [_2]'
 ---
 id: command.general.help.can_alter
 str: ' (can alter a message)'
@@ -96,11 +93,11 @@ str: '~[<command>~]'
 id: command.help.help.description
 str: 'get help about commands'
 ---
+id: command.help.err.no_command
+str: 'no such command "[_1]"'
+---
 id: command.help.msg.usage
 str: 'Command usage: [_1], [_2].'
----
-id: command.help.msg.no_command
-str: 'No such command: [_1].'
 ---
 id: command.help.msg.info
 str: 'Commands are prefixed by "[_1]". Some commands may alter a message when prefixed with "[_2]". Available commands are: [_3]. Type [_1][_4] with command name for more info.'

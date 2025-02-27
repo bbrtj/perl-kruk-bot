@@ -95,11 +95,7 @@ sub execute ($self, $ctx, $args, $altering)
 			$self->bot_instance->log->debug($e);
 		}
 
-		$ctx->set_response(
-			$hint
-			? _t 'command.general.err.full_error_with_hint', $hint, $self->get_usage
-			: _t 'command.general.err.full_error', $self->get_usage
-		);
+		$ctx->set_response(_t 'command.general.err.full_error', $hint, $self->get_usage);
 	}
 }
 

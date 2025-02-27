@@ -18,7 +18,7 @@ sub run ($self, $ctx, @args)
 		my $command_name = $args[0];
 		my $command = $self->bot_instance->commands->{$command_name};
 
-		return _t 'command.help.msg.no_command', $command_name unless $command;
+		die {hint => _t 'command.help.err.no_command', $command_name} unless $command;
 		return _t 'command.help.msg.usage', $command->get_usage, $command->get_full_description;
 	}
 	elsif (@args == 0) {

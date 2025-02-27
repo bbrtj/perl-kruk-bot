@@ -46,16 +46,13 @@ id: command.general.err.bad_alter_arguments
 str: 'nieprawidłowe argumenty komendy modyfikującej'
 ---
 id: command.general.err.cant_alter
-str: 'Komenda [_1] nie może modyfikować wiadomości'
+str: 'Komenda [_1] nie może modyfikować wiadomości.'
 ---
 id: command.general.err.must_alter
-str: 'Komenda [_1] musi modyfikować wiadomość'
+str: 'Komenda [_1] musi modyfikować wiadomość.'
 ---
 id: command.general.err.full_error
-str: 'Błąd komendy. Użycie: [_1]'
----
-id: command.general.err.full_error_with_hint
-str: 'Błąd komendy: [_1]. Użycie: [_2]'
+str: 'Błąd komendy[prepend_if_exists,_1,: ]. Użycie: [_2]'
 ---
 id: command.general.help.can_alter
 str: ' (może modyfikować wiadomość)'
@@ -96,11 +93,11 @@ str: '~[<komenda>~]'
 id: command.help.help.description
 str: 'uzyskaj pomoc na temat komend'
 ---
+id: command.help.err.no_command
+str: 'nie ma komendy "[_1]"'
+---
 id: command.help.msg.usage
 str: 'Użycie komendy: [_1], [_2].'
----
-id: command.help.msg.no_command
-str: 'Nie ma takiej komendy: [_1].'
 ---
 id: command.help.msg.info
 str: 'Komendy są poprzedzone znakiem "[_1]". Niektóre komendy mogą modyfikować wiadomość gdy są poprzedzone "[_2]". Dostępne komendy to: [_3]. Wpisz [_1][_4] z nazwą komendy, aby uzyskać więcej informacji.'

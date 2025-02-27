@@ -22,3 +22,9 @@ foreach my $file (glob 'i18n/*.yml') {
 	}
 }
 
+sub prepend_if_exists ($self, $param, $with)
+{
+	return '' unless ($param // '') ne '';
+	return "$with$param";
+}
+
