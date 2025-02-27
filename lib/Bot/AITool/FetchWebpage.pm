@@ -73,8 +73,8 @@ sub runner ($self, $ctx, $input)
 					$element->destroy;
 				}
 
+				$body = $formatter->format($tree);
 				# handle html charset?
-				#$body = $formatter->format($tree);
 				#my $charset_el = $tree->look_down(_tag => 'meta', charset => qr/.+/);
 				#$charset = $charset_el->attr('charset') if $charset_el;
 			}
