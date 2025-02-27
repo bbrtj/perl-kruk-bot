@@ -1,11 +1,9 @@
 requires 'Mojolicious';
-requires 'Cpanel::JSON::XS';
-requires 'Env::Dot';
-requires 'Mooish::Base';
-
 requires 'Mojo::IRC';
 requires 'IO::Socket::SSL';
 
+requires 'Mooish::Base';
+requires 'Env::Dot';
 requires 'all';
 requires 'Data::ULID';
 requires 'Log::Dispatch';
@@ -16,9 +14,8 @@ requires 'Rose::DB::Object';
 requires 'DBD::Pg';
 requires 'DBD::SQLite';
 
-requires 'Data::Localize';
-requires 'Data::Localize::YAML';
-requires 'Data::Localize::Format::Sprintf';
+requires 'Cpanel::JSON::XS';
+requires 'YAML::PP';
 
 on test => sub {
 	requires 'Test2::V0';

@@ -259,58 +259,6 @@ DISTRIBUTIONS
       ExtUtils::MakeMaker 6.48
       Test::Simple 0.90
       perl 5.008001
-  Data-Localize-0.00028
-    pathname: D/DM/DMAKI/Data-Localize-0.00028.tar.gz
-    provides:
-      Data::Localize 0.00028
-      Data::Localize::Auto undef
-      Data::Localize::Format undef
-      Data::Localize::Format::Gettext undef
-      Data::Localize::Format::Maketext undef
-      Data::Localize::Format::NamedArgs undef
-      Data::Localize::Gettext undef
-      Data::Localize::Gettext::Parser undef
-      Data::Localize::Localizer undef
-      Data::Localize::Log undef
-      Data::Localize::MultiLevel undef
-      Data::Localize::Namespace undef
-      Data::Localize::Storage undef
-      Data::Localize::Storage::BerkeleyDB undef
-      Data::Localize::Storage::Hash undef
-      Data::Localize::Trait::WithStorage undef
-      Data::Localize::Util undef
-    requirements:
-      Encode 0
-      ExtUtils::MakeMaker 6.59
-      I18N::LangTags 0
-      I18N::LangTags::Detect 0
-      Log::Minimal 0.14
-      Module::Build::Tiny 0.035
-      Module::Load 0
-      Module::Pluggable::Object 0
-      Moo 1.000008
-      MooX::Types::MooseLike::Base 0
-      Test::More 0.94
-      Test::Requires 0
-      perl 5.008
-  Data-Localize-Format-Sprintf-0.001
-    pathname: B/BR/BRTASTIC/Data-Localize-Format-Sprintf-0.001.tar.gz
-    provides:
-      Data::Localize::Format::Sprintf 0.001
-    requirements:
-      Data::Localize 0
-      ExtUtils::MakeMaker 0
-      perl 5.008
-  Data-Localize-YAML-0.001
-    pathname: B/BR/BRTASTIC/Data-Localize-YAML-0.001.tar.gz
-    provides:
-      Data::Localize::YAML 0.001
-    requirements:
-      Data::Localize 0
-      ExtUtils::MakeMaker 0
-      Moo 2
-      YAML::Tiny 0
-      perl 5.010
   Data-OptList-0.114
     pathname: R/RJ/RJBS/Data-OptList-0.114.tar.gz
     provides:
@@ -1262,18 +1210,6 @@ DISTRIBUTIONS
       perl 5.006
       strict 0
       warnings 0
-  Log-Minimal-0.19
-    pathname: K/KA/KAZEBURO/Log-Minimal-0.19.tar.gz
-    provides:
-      Log::Minimal 0.19
-    requirements:
-      CPAN::Meta 0
-      CPAN::Meta::Prereqs 0
-      Data::Dumper 0
-      ExtUtils::CBuilder 0
-      Module::Build 0.38
-      Scalar::Util 0
-      Term::ANSIColor 0
   MIME-Base32-1.303
     pathname: R/RE/REHSACK/MIME-Base32-1.303.tar.gz
     provides:
@@ -1371,22 +1307,6 @@ DISTRIBUTIONS
       Try::Tiny 0
       strict 0
       warnings 0
-  Module-Pluggable-5.2
-    pathname: S/SI/SIMONW/Module-Pluggable-5.2.tar.gz
-    provides:
-      Devel::InnerPackage 0.4
-      Module::Pluggable 5.2
-      Module::Pluggable::Object 5.2
-    requirements:
-      Exporter 5.57
-      ExtUtils::MakeMaker 0
-      File::Basename 0
-      File::Find 0
-      File::Spec 3.00
-      File::Spec::Functions 0
-      if 0
-      perl 5.005030
-      strict 0
   Module-Runtime-0.016
     pathname: Z/ZE/ZEFRAM/Module-Runtime-0.016.tar.gz
     provides:
@@ -1557,14 +1477,6 @@ DISTRIBUTIONS
       Sub::Defer 2.006006
       Sub::Quote 2.006006
       perl 5.006
-  MooX-Types-MooseLike-0.29
-    pathname: M/MA/MATEU/MooX-Types-MooseLike-0.29.tar.gz
-    provides:
-      MooX::Types::MooseLike 0.29
-      MooX::Types::MooseLike::Base 0.29
-    requirements:
-      ExtUtils::MakeMaker 0
-      Module::Runtime 0.014
   Mooish-AttributeBuilder-1.003
     pathname: B/BR/BRTASTIC/Mooish-AttributeBuilder-1.003.tar.gz
     provides:
@@ -2041,15 +1953,6 @@ DISTRIBUTIONS
       Try::Tiny 0.07
       strict 0
       warnings 0
-  Test-Requires-0.11
-    pathname: T/TO/TOKUHIROM/Test-Requires-0.11.tar.gz
-    provides:
-      Test::Requires 0.11
-    requirements:
-      ExtUtils::MakeMaker 6.64
-      Test::Builder::Module 0
-      Test::More 0.47
-      perl 5.006
   Time-Clock-1.03
     pathname: J/JS/JSIRACUSA/Time-Clock-1.03.tar.gz
     provides:
@@ -2286,18 +2189,60 @@ DISTRIBUTIONS
     requirements:
       ExtUtils::MakeMaker 0
       perl 5.008
-  YAML-Tiny-1.74
-    pathname: E/ET/ETHER/YAML-Tiny-1.74.tar.gz
+  YAML-PP-v0.38.0
+    pathname: T/TI/TINITA/YAML-PP-v0.38.0.tar.gz
     provides:
-      YAML::Tiny 1.74
+      YAML::PP v0.38.0
+      YAML::PP::Common v0.38.0
+      YAML::PP::Constructor v0.38.0
+      YAML::PP::Dumper v0.38.0
+      YAML::PP::Emitter v0.38.0
+      YAML::PP::Exception v0.38.0
+      YAML::PP::Grammar v0.38.0
+      YAML::PP::Highlight v0.38.0
+      YAML::PP::Lexer v0.38.0
+      YAML::PP::Loader v0.38.0
+      YAML::PP::Parser v0.38.0
+      YAML::PP::Perl v0.38.0
+      YAML::PP::Preserve::Array v0.38.0
+      YAML::PP::Preserve::Hash v0.38.0
+      YAML::PP::Preserve::Scalar v0.38.0
+      YAML::PP::Reader v0.38.0
+      YAML::PP::Reader::File v0.38.0
+      YAML::PP::Render v0.38.0
+      YAML::PP::Representer v0.38.0
+      YAML::PP::Schema v0.38.0
+      YAML::PP::Schema::Binary v0.38.0
+      YAML::PP::Schema::Core v0.38.0
+      YAML::PP::Schema::Failsafe v0.38.0
+      YAML::PP::Schema::Include v0.38.0
+      YAML::PP::Schema::JSON v0.38.0
+      YAML::PP::Schema::Merge v0.38.0
+      YAML::PP::Schema::Perl v0.38.0
+      YAML::PP::Schema::Tie::IxHash v0.38.0
+      YAML::PP::Schema::YAML1_1 v0.38.0
+      YAML::PP::Type::MergeKey v0.38.0
+      YAML::PP::Writer v0.38.0
+      YAML::PP::Writer::File v0.38.0
     requirements:
       B 0
+      B::Deparse 0
       Carp 0
+      Data::Dumper 0
+      Encode 0
       Exporter 0
       ExtUtils::MakeMaker 0
-      Fcntl 0
-      Scalar::Util 0
-      perl 5.008001
+      File::Basename 0
+      Getopt::Long 0
+      MIME::Base64 0
+      Module::Load 0
+      Scalar::Util 1.07
+      Tie::Array 0
+      Tie::Hash 0
+      base 0
+      constant 0
+      overload 0
+      perl 5.008000
       strict 0
       warnings 0
   all-0.5101

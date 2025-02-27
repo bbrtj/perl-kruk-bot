@@ -1,61 +1,61 @@
 ---
 id: help
-str: Jestem czatbotem. Napisz "%shelp" aby uzyskać listę komend. Jeśli wpiszesz coś co nie wygląda jak komenda, użyję swojej SI aby odpowiedzieć.
+str: 'Jestem czatbotem. Napisz "[_1]help" aby uzyskać listę komend. Jeśli wpiszesz coś co nie wygląda jak komenda, użyję swojej SI aby odpowiedzieć.'
 ---
 id: err.unknown_command
-str: Nieznana komenda "%s".
+str: 'Nieznana komenda "[_1]".'
 ---
 id: err.ai_use_refused
-str: Przykro mi, ale nie jesteś uprawniony do użycia mojej SI.
+str: 'Przykro mi, ale nie jesteś uprawniony do użycia mojej SI.'
 ---
 id: err.no_response
 str: 'Błąd systemu: nie wygenerowano odpowiedzi.'
 ---
 id: err.no_ai_response
-str: 'Błąd SI: nie udało się uzyskać odpowiedzi po %s próbach.'
+str: 'Błąd SI: nie udało się uzyskać odpowiedzi po [_1] próbach.'
 
 # fetch_webpage tool
 ---
 id: tool.fetch_webpage.msg.info
-str: pobieram %s - %s
+str: 'pobieram [_1] - [_2]'
 ---
 id: tool.fetch_webpage.err.failed
-str: pobieram %s - niepowodzenie
+str: 'pobieram [_1] - niepowodzenie'
 
 # read_chat tool
 ---
 id: tool.read_chat.msg.info
-str: czyta czat
+str: 'czyta czat'
 
 # save_self_note tool
 ---
 id: tool.save_self_note.msg.info
-str: bazgrze
+str: 'bazgrze'
 
 # save_user_note tool
 ---
 id: tool.save_self_note.msg.info
-str: notuje
+str: 'notuje'
 
 # General commands
 ---
 id: command.general.err.bad_arguments
-str: nieprawidłowe argumenty komendy
+str: 'nieprawidłowe argumenty komendy'
 ---
 id: command.general.err.bad_alter_arguments
-str: nieprawidłowe argumenty komendy modyfikującej
+str: 'nieprawidłowe argumenty komendy modyfikującej'
 ---
 id: command.general.err.cant_alter
-str: Komenda %s nie może modyfikować wiadomości
+str: 'Komenda [_1] nie może modyfikować wiadomości'
 ---
 id: command.general.err.must_alter
-str: Komenda %s musi modyfikować wiadomość
+str: 'Komenda [_1] musi modyfikować wiadomość'
 ---
 id: command.general.err.full_error
-str: 'Błąd komendy. Użycie: %s'
+str: 'Błąd komendy. Użycie: [_1]'
 ---
 id: command.general.err.full_error_with_hint
-str: 'Błąd komendy: %s. Użycie: %s'
+str: 'Błąd komendy: [_1]. Użycie: [_2]'
 ---
 id: command.general.help.can_alter
 str: ' (może modyfikować wiadomość)'
@@ -66,104 +66,104 @@ str: ' (musi modyfikować wiadomość)'
 # calc command
 ---
 id: command.calc.help.syntax
-str: [<wyrażenie>]
+str: '~[<wyrażenie>~]'
 ---
 id: command.calc.help.description
-str: oblicza wyrażenie matematyczne
+str: 'oblicza wyrażenie matematyczne'
 ---
 id: command.calc.help.description_with_syntax
-str: 'oblicza wyrażenie matematyczne. Składnia: ```%s```'
+str: 'oblicza wyrażenie matematyczne. Składnia: ```[_1]```'
 
 # chat command
 ---
 id: command.chat.help.syntax
-str: [clear]
+str: '~[clear~]'
 ---
 id: command.chat.help.description
-str: pokaż lub modyfikuj szczegóły obecnego czatu
+str: 'pokaż lub modyfikuj szczegóły obecnego czatu'
 ---
 id: command.chat.msg.cleared
-str: Czat wyczyszczony.
+str: 'Czat wyczyszczony.'
 ---
 id: command.chat.msg.info
-str: Twoja obecna rozmowa rozpoczęła się %s oraz ma w sobie %s wiadomości.
+str: 'Twoja obecna rozmowa rozpoczęła się [_1] oraz ma w sobie [_2] wiadomości.'
 
 # help command
 ---
 id: command.help.help.syntax
-str: [<komenda>]
+str: '~[<komenda>~]'
 ---
 id: command.help.help.description
-str: uzyskaj pomoc na temat komend
+str: 'uzyskaj pomoc na temat komend'
 ---
 id: command.help.msg.usage
-str: 'Użycie komendy: %s, %s.'
+str: 'Użycie komendy: [_1], [_2].'
 ---
 id: command.help.msg.no_command
-str: 'Nie ma takiej komendy: %s.'
+str: 'Nie ma takiej komendy: [_1].'
 ---
 id: command.help.msg.info
-str: 'Komendy są poprzedzone znakiem "%s". Niektóre komendy mogą modyfikować wiadomość gdy są poprzedzone "%s". Dostępne komendy to: %s. Wpisz %1$s%s z nazwą komendy, aby uzyskać więcej informacji.'
+str: 'Komendy są poprzedzone znakiem "[_1]". Niektóre komendy mogą modyfikować wiadomość gdy są poprzedzone "[_2]". Dostępne komendy to: [_3]. Wpisz [_1][_4] z nazwą komendy, aby uzyskać więcej informacji.'
 
 # mynotes command
 ---
 id: command.mynotes.help.syntax
-str: [remove <id>]
+str: '~[remove <id>~]'
 ---
 id: command.mynotes.help.description
-str: sprawdź i usuń notatki bota o użytkownikach
+str: 'sprawdź i usuń notatki bota o użytkownikach'
 ---
 id: command.mynotes.msg.list_prefix
 str: 'To jest lista moich notatek na Twój temat:'
 ---
 id: command.mynotes.msg.no_notes
-str: Nie mam żadnych notatek na Twój temat.
+str: 'Nie mam żadnych notatek na Twój temat.'
 ---
 id: command.mynotes.msg.removed
-str: Notatka o Tobie została usunięta.
+str: 'Notatka o Tobie została usunięta.'
 ---
 id: command.mynotes.msg.not_removed
-str: Notatka o Tobie nie została usunięta.
+str: 'Notatka o Tobie nie została usunięta.'
 
 # notes command
 ---
 id: command.notes.help.syntax
-str: [remove <id>]
+str: '~[remove <id>~]'
 ---
 id: command.notes.help.description
-str: sprawdź i usuń wpisy w dzienniku bota
+str: 'sprawdź i usuń wpisy w dzienniku bota'
 ---
 id: command.notes.msg.list_prefix
 str: 'To jest mój dziennik:'
 ---
 id: command.notes.msg.no_notes
-str: Mój dziennik jest pusty.
+str: 'Mój dziennik jest pusty.'
 ---
 id: command.notes.msg.removed
-str: Wpis dziennika został usunięty.
+str: 'Wpis dziennika został usunięty.'
 ---
 id: command.notes.msg.not_removed
-str: Wpis dziennika nie został usunięty.
+str: 'Wpis dziennika nie został usunięty.'
 
 # personality command
 ---
 id: command.personality.help.syntax
-str: [<nazwa>]
+str: '~[<nazwa>~]'
 ---
 id: command.personality.help.description
-str: pokaż i modyfikuj osobowości bota (wobec Ciebie)
+str: 'pokaż i modyfikuj osobowości bota (wobec Ciebie)'
 ---
 id: command.personality.msg.info
-str: 'Obecnie rozmawiasz z botem o osobowości "%s". Dostępne opcje to: %s.'
+str: 'Obecnie rozmawiasz z botem o osobowości "[_1]". Dostępne opcje to: [_2].'
 ---
 id: command.personality.msg.modified
-str: Osobowość zmodyfikowana.
+str: 'Osobowość zmodyfikowana.'
 ---
 id: command.personality.err.invalid
-str: nie ma takiej osobowości
+str: 'nie ma takiej osobowości'
 
 # sudo command
 ---
 id: command.sudo.help.description
-str: uzyskaj dostęp do funkcji bota naruszających prywatność
+str: 'uzyskaj dostęp do funkcji bota naruszających prywatność'
 

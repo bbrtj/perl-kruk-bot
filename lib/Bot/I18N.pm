@@ -2,31 +2,17 @@ package Bot::I18N;
 
 use v5.40;
 
+use Bot::I18N::Core;
 use Exporter qw(import);
-
-use Data::Localize;
-use Data::Localize::Format::Sprintf;
 
 our @EXPORT = qw(_t);
 
-my $localizer = do {
-	my $loc = Data::Localize->new();
-
-	$loc->add_localizer(
-		class => 'YAML',
-		path => 'i18n/*.yml',
-		formatter => Data::Localize::Format::Sprintf->new,
-	);
-
-	$loc->auto(0);
-	$loc->set_languages($ENV{KRUK_LANG} // 'en');
-
-	$loc;
-};
+my $localizer = Bot::I18N::Core->get_handle($ENV{KRUK_LANG} // 'en')
+	or die 'could not get localization handle';
 
 sub _t ($key, @args)
 {
-	my $localized = $localizer->localize($key, @args);
+	my $localized = $localizer->maketext($key, @args);
 
 	if (!defined $localized) {
 		Bot::Log->singleton->error("did not find translation for $key");
