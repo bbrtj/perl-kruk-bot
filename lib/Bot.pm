@@ -12,6 +12,7 @@ use Regexp::Common qw(RE_ALL);
 use Bot::I18N;
 use Bot::Log;
 use Bot::Notes;
+use Bot::Cache;
 use Bot::Context;
 use Bot::Conversation;
 use Bot::Conversation::Config;
@@ -44,11 +45,6 @@ has param 'trusted_users' => (
 	lazy => sub ($self) {
 		[split /,/, $ENV{KRUK_TRUSTED_USERS} // $self->owner]
 	}
-);
-
-has param 'min_cache_length' => (
-	isa => PositiveOrZeroInt,
-	default => 8000,
 );
 
 has field 'claude_api_key' => (
@@ -102,6 +98,13 @@ has field 'notes' => (
 	},
 );
 
+has field 'cache' => (
+	isa => InstanceOf ['Bot::Cache'],
+	default => sub ($self) {
+		Bot::Cache->new(bot_instance => $self);
+	},
+);
+
 has field 'ua' => (
 	isa => InstanceOf ['Mojo::UserAgent'],
 	default => sub {
@@ -116,16 +119,11 @@ has field 'log' => (
 	},
 );
 
-sub _make_text_with_caching ($self, $text)
+sub _make_text ($self, $text)
 {
-	my $should_cache = length $text > $self->min_cache_length;
-	$self->log->debug('Requesting caching of text: ' . (length $text) . ' characters')
-		if $should_cache;
-
 	return {
 		type => 'text',
 		text => $text,
-		($should_cache ? (cache_control => {type => 'ephemeral'}) : ()),
 	};
 }
 
@@ -161,7 +159,7 @@ sub _system_prompts ($self, $ctx)
 		$self->notes->dump(prefix => 'Here is your diary:'),
 		$self->notes->dump(aspect => $ctx->user, prefix => 'Here are your notes about the user:');
 
-	@prompts = map { $self->_make_text_with_caching($_) } @prompts;
+	@prompts = map { $self->_make_text($_) } @prompts;
 	$params{system} = \@prompts;
 	return %params;
 }
@@ -295,7 +293,7 @@ sub use_tool ($self, $ctx, $tool_data)
 					type => 'tool_result',
 					tool_use_id => $tool_data->{id},
 					content => [
-						$self->_make_text_with_caching($result)
+						$self->_make_text($result)
 					],
 				}
 			);
@@ -323,21 +321,26 @@ sub use_tool ($self, $ctx, $tool_data)
 sub _query ($self, $ctx)
 {
 	return Mojo::Promise->resolve if $ctx->has_response;
+
+	my $data = {
+		$self->_system_prompts($ctx),
+		max_tokens => 1024,
+		messages => $self->get_conversation($ctx)->api_call_format_messages,
+		tool_choice => {type => 'auto'},
+		tools => [
+			map { $_->definition } grep { $_->available($ctx) } values $self->tools->%*
+		],
+	};
+
+	my $cached_data = $self->cache->process_cache($ctx, $data);
+
 	return $self->ua->post_p(
 		'https://api.anthropic.com/v1/messages',
 		{
 			'x-api-key' => $self->claude_api_key,
 			'anthropic-version' => '2023-06-01',
 		},
-		json => {
-			$self->_system_prompts($ctx),
-			max_tokens => 1_000,
-			messages => $self->get_conversation($ctx)->api_call_format_messages,
-			tool_choice => {type => 'auto'},
-			tools => [
-				map { $_->definition } grep { $_->available($ctx) } values $self->tools->%*
-			],
-		},
+		json => $data
 	)->then(
 		sub ($tx) {
 			my $res = $tx->result;
@@ -346,8 +349,20 @@ sub _query ($self, $ctx)
 				die {retry => !!1};
 			}
 
+			my $json = $res->json;
+			$self->log->debug(
+				sprintf(
+					'Input tokens expected/actual (cache read/write): %s/%s (%s/%s)',
+					$cached_data->{expected_tokens},
+					$json->{usage}->@{qw(input_tokens cache_read_input_tokens cache_creation_input_tokens)}
+				)
+			);
+
+			$self->get_conversation($ctx)->set_cached
+				if $cached_data->{messages_cached} && $json->{usage}{cache_creation_input_tokens} > 0;
+
 			try {
-				$self->_process_query_data($ctx, $res->json);
+				$self->_process_query_data($ctx, $json);
 			}
 			catch ($e) {
 				$self->log->error("AI query fatal error: $e");
