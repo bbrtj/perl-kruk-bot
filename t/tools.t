@@ -92,8 +92,50 @@ subtest 'should handle a non-existing webpage' => sub {
 	my $conv = $bot->get_conversation($ctx);
 	my $last_message = $conv->messages->[-1];
 	is $last_message->[0], 'user', 'last entry is user role ok';
-	like $last_message->[1][0]{content}[0]{text}, qr/error fetching webpage/i, 'website data looks ok';
+	like $last_message->[1][0]{content}[0]{text}, qr/error fetching webpage/i, 'error looks ok';
 	is $ctx->response_extras->[0], 'fetching https://notapage.pl - failed', 'user informed ok';
+};
+
+subtest 'should reject unsupported content type' => sub {
+	my $ctx = build_context('go to https://cdn.perl.org/perlweb/images/icons/header_camel.png');
+	my $p = $bot->use_tool(
+		$ctx, {
+			name => 'fetch_webpage',
+			input => {
+				url => 'https://cdn.perl.org/perlweb/images/icons/header_camel.png',
+			}
+		}
+	);
+
+	$p->wait if $p;
+
+	my $conv = $bot->get_conversation($ctx);
+	my $last_message = $conv->messages->[-1];
+	is $last_message->[0], 'user', 'last entry is user role ok';
+	like $last_message->[1][0]{content}[0]{text}, qr/unsupported/i, 'unsupported file ok';
+	is $ctx->response_extras->[0], 'fetching https://cdn.perl.org/perlweb/images/icons/header_camel.png - failed',
+		'user informed ok';
+};
+
+subtest 'should truncate a very long page' => sub {
+	my $ctx = build_context('go to https://perldoc.perl.org/Locale::Maketext');
+	my $p = $bot->use_tool(
+		$ctx, {
+			name => 'fetch_webpage',
+			input => {
+				url => 'https://perldoc.perl.org/Locale::Maketext',
+			}
+		}
+	);
+
+	$p->wait if $p;
+
+	my $conv = $bot->get_conversation($ctx);
+	my $last_message = $conv->messages->[-1];
+	is $last_message->[0], 'user', 'last entry is user role ok';
+	is length $last_message->[1][0]{content}[0]{text}, 20000, 'website data length ok';
+	like $last_message->[1][0]{content}[0]{text}, qr/do not retry fetching the page./i, 'website data truncated ok';
+	like $ctx->response_extras->[0], qr/truncated to \d+%/, 'user informed ok';
 };
 
 done_testing;
