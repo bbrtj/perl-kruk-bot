@@ -167,3 +167,20 @@ str: 'no such personality'
 id: command.sudo.help.description
 str: 'access privacy-violating bot functions'
 
+# timer command
+---
+id: command.timer.help.syntax
+str: '<timer_seconds> <message>'
+---
+id: command.timer.help.description
+str: 'request a timer after given time'
+---
+id: command.timer.err.not_possible
+str: 'timers are not possible in this environment'
+---
+id: command.timer.err.too_long
+str: 'maximum timer seconds are [_1]'
+---
+id: command.timer.msg.registered
+str: 'Timer has been registered.'
+

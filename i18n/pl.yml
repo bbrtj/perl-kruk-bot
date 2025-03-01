@@ -167,3 +167,20 @@ str: 'nie ma takiej osobowości'
 id: command.sudo.help.description
 str: 'uzyskaj dostęp do funkcji bota naruszających prywatność'
 
+# timer command
+---
+id: command.timer.help.syntax
+str: '<sekundy_minutnika> <wiadomość>'
+---
+id: command.timer.help.description
+str: 'nastaw minutnik na konkretny czas'
+---
+id: command.timer.err.not_possible
+str: 'minutnik nie jest możliwy w tym środowisku'
+---
+id: command.timer.err.too_long
+str: 'maksymalny czas minutnika to [_1] sekund'
+---
+id: command.timer.msg.registered
+str: 'Minutnik został nastawiony.'
+
