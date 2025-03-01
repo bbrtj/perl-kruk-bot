@@ -1,4 +1,4 @@
--- Deploy kruk:snippets to sqlite
+-- Deploy kruk:snippets to pg
 
 BEGIN;
 
@@ -9,7 +9,7 @@ CREATE TABLE snippets(
 	created_at INTEGER NOT NULL
 );
 
-CREATE INDEX ind_snippets_lookup ON snipets (created_at);
+CREATE INDEX ind_snippets_lookup ON snippets (created_at);
 
 COMMIT;
 

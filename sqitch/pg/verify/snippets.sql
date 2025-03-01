@@ -1,4 +1,4 @@
--- Verify kruk:snippets on sqlite
+-- Verify kruk:snippets on pg
 
 BEGIN;
 

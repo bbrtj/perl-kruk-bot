@@ -1,4 +1,4 @@
--- Revert kruk:snippets from sqlite
+-- Revert kruk:snippets from pg
 
 BEGIN;
 
