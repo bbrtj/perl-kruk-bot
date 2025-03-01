@@ -9,6 +9,7 @@ use Mojo::Promise;
 use List::Util qw(any);
 use Regexp::Common qw(RE_ALL);
 
+use Kruk;
 use Bot::I18N;
 use Bot::Log;
 use Bot::Notes;
@@ -135,7 +136,7 @@ sub _system_prompts ($self, $ctx)
 	my $set_param = sub ($key, $value) { $params{$key} = $value };
 
 	push @prompts, $template->render_file(
-		"prompts/personality.@{[$ctx->config->personality]}.ep", {
+		Kruk->root_dir->child("prompts/personality.@{[$ctx->config->personality]}.ep"), {
 			bot => $self,
 			ctx => $ctx,
 			set_param => $set_param,
@@ -144,7 +145,7 @@ sub _system_prompts ($self, $ctx)
 
 	try {
 		push @prompts, $template->render_file(
-			"prompts/environment.@{[$self->environment]}.ep", {
+			Kruk->root_dir->child("prompts/environment.@{[$self->environment]}.ep"), {
 				bot => $self,
 				ctx => $ctx,
 				set_param => $set_param,

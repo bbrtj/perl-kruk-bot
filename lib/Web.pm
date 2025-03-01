@@ -5,6 +5,8 @@ use v5.40;
 use Mooish::Base;
 use Mojo::URL;
 
+use Kruk;
+
 extends 'Mojolicious';
 
 has field 'base_url' => (
@@ -15,8 +17,9 @@ has field 'base_url' => (
 sub startup ($self)
 {
 	$self->secrets([$ENV{MOJO_SECRETS}]);
-	my $r = $self->routes;
+	push $self->renderer->paths->@*, Kruk->root_dir->child('templates');
 
+	my $r = $self->routes;
 	$r->get('/snippet/:snippet_id')->to('snippet#fetch')->name('snippet');
 }
 

@@ -4,8 +4,9 @@ use v5.40;
 
 use parent 'Locale::Maketext';
 use YAML::PP qw(LoadFile);
+use Kruk;
 
-foreach my $file (glob 'i18n/*.yml') {
+foreach my $file (glob Kruk->root_dir->child('i18n/*.yml')) {
 	my ($lang) = $file =~ m{/(\w+)\.yml};
 	my @lexicon = LoadFile($file);
 

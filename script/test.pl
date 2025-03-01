@@ -1,7 +1,10 @@
 #!/usr/bin/env perl
 # HARNESS-NO-PRELOAD
 # HARNESS-CAT-LONG
-# THIS IS A GENERATED YATH RUNNER TEST
+
+# running this requires App::Yath installed globally
+# due to a bug, carmel must be rolled out to run it
+
 use strict;
 use warnings;
 
@@ -10,7 +13,6 @@ use App::Yath::Util qw/find_yath/;
 use Env qw(@PERL5LIB);
 
 unshift @PERL5LIB, 'lib';
-unshift @PERL5LIB, 'local/lib/perl5';
 
 $ENV{DB_ENGINE} = 'SQLite';
 $ENV{DB_DATABASE} = 'test.db';
