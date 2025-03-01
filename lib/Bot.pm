@@ -120,6 +120,11 @@ has field 'log' => (
 	},
 );
 
+has field 'context_sub' => (
+	isa => CodeRef,
+	writer => 'on_new_context',
+);
+
 sub _make_text ($self, $text)
 {
 	return {
@@ -273,6 +278,11 @@ sub get_context ($self, @params)
 {
 	my $ctx = Bot::Context->new(@params);
 	$ctx->set_config($self->get_conversation($ctx)->config->clone);
+
+	if (my $hook = $self->context_sub) {
+		$hook->($ctx);
+	}
+
 	return $ctx;
 }
 

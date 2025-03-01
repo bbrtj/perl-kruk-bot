@@ -11,20 +11,23 @@ use Bot::IRC;
 my $bot = Bot->new(environment => 'irc');
 my $irc = Bot::IRC->new;
 
-$irc->configure(
-	sub ($msg) {
-		my $ctx = $bot->get_context($msg);
-
-		$bot->add_message($ctx);
-
-		return unless $msg->{for_me};
-
-		$bot->query($ctx);
+$bot->on_new_context(
+	sub ($ctx) {
 		$ctx->promise->then(
 			sub {
 				$irc->speak($ctx);
 			}
 		);
+	}
+);
+
+$irc->configure(
+	sub ($msg) {
+		my $ctx = $bot->get_context($msg);
+
+		$bot->add_message($ctx);
+		$bot->query($ctx)
+			if $msg->{for_me};
 	}
 );
 
