@@ -277,7 +277,8 @@ sub get_context ($self, @params)
 
 sub get_conversation ($self, $ctx)
 {
-	my $conv = $self->conversations->{$ctx->user} //= Bot::Conversation->new(
+	my $key = sprintf '%s -> %s', $ctx->channel // '', $ctx->user;
+	my $conv = $self->conversations->{$key} //= Bot::Conversation->new(
 		config => $self->config->clone,
 		conversation_lifetime => $self->conversation_lifetime,
 	);
