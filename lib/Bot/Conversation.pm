@@ -71,7 +71,7 @@ sub add_message ($self, $role, $message)
 	else {
 		push $msgs->@*, [$role, [$message]];
 		if (!$self->check_cached) {
-			splice $msgs->@*, 0, -1 * $self->config->history_size * 2;
+			splice $msgs->@*, 0, -1 * $self->config->history_size;
 		}
 	}
 

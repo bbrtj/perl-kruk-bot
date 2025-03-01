@@ -352,9 +352,10 @@ sub _query ($self, $ctx)
 			my $json = $res->json;
 			$self->log->debug(
 				sprintf(
-					'Input tokens expected/actual (cache read/write): %s/%s (%s/%s)',
+					'Input tokens expected/actual (cache read/write): %s/%s (%s/%s), %s cache breakpoints',
 					$cached_data->{expected_tokens},
-					$json->{usage}->@{qw(input_tokens cache_read_input_tokens cache_creation_input_tokens)}
+					$json->{usage}->@{qw(input_tokens cache_read_input_tokens cache_creation_input_tokens)},
+					$cached_data->{breakpoints},
 				)
 			);
 

@@ -45,16 +45,23 @@ sub _extract_prompts ($self, $object, $where)
 	return @results;
 }
 
+# tries to approximate the number of tokens (always underestimates). Based on
+# the result, decides where to put cache breakpoints
 sub process_cache ($self, $ctx, $request_data)
 {
 	my @prompts = map { $self->_extract_prompts($request_data->{$_}, $_) } CACHE_ORDER->@*;
 	my $cache_threshold = $request_data->{model} =~ /haiku/i ? MIN_CACHE_TOKENS_HAIKU : MIN_CACHE_TOKENS_SONNET;
 	my $tokens = $prompts[0] && $prompts[0][2] eq CACHE_ORDER->[0] ? TOOLS_PROMPT_TOKENS : 0;
+	my $breakpoints = 0;
+
+	# up to 2 cache breakpoints in messages section
+	my $cache_after_message = int($ctx->config->history_size / 2);
 
 	my sub add_breakpoint ($prompt)
 	{
-		state $breakpoints = MAX_BREAKPOINTS;
-		return !!0 if --$breakpoints <= 0;
+		return !!1 if defined $prompt->[1]{cache_control}{type};
+		return !!0 if $breakpoints == MAX_BREAKPOINTS;
+		$breakpoints += 1;
 
 		$self->bot_instance->log->debug("Setting a cache breakpoint in $prompt->[2] block");
 		$prompt->[1]{cache_control}{type} = 'ephemeral';
@@ -63,6 +70,7 @@ sub process_cache ($self, $ctx, $request_data)
 
 	my $messages_cached = !!0;
 	my $last;
+	my $message_number = 0;
 	foreach my $prompt (@prompts) {
 		my $tokens_in_prompt = length($prompt->[1]->{$prompt->[0]}) / CHARACTERS_PER_TOKEN;
 
@@ -73,16 +81,27 @@ sub process_cache ($self, $ctx, $request_data)
 
 		$tokens += $tokens_in_prompt;
 
-		# this prompt alone is big enough to justify caching
-		if ($prompt->[2] eq CACHE_ORDER->[-1] && $tokens_in_prompt > $cache_threshold) {
-			$messages_cached ||= add_breakpoint($prompt);
+		if ($prompt->[2] eq CACHE_ORDER->[-1]) {
+			++$message_number;
+
+			# this prompt alone is big enough to justify caching
+			my $big_prompt = $tokens_in_prompt > $cache_threshold;
+
+			# message at cache checkpoint, and the prompt is big enough
+			my $checkpoint_message = $message_number % $cache_after_message == 0 && $tokens > $cache_threshold;
+
+			if ($big_prompt || $checkpoint_message) {
+				$messages_cached = add_breakpoint($prompt) || $messages_cached;
+			}
 		}
+
 		$last = $prompt;
 	}
 
 	return {
 		expected_tokens => $tokens,
 		messages_cached => $messages_cached,
+		breakpoints => $breakpoints,
 	};
 }
 

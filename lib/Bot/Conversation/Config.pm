@@ -18,9 +18,10 @@ has param 'personality' => (
 	writer => 1,
 );
 
+# must be even, so that conversation turns will be perserved
 has param 'history_size' => (
 	isa => PositiveInt,
-	default => 25,
+	default => 30,
 	writer => 1,
 );
 
