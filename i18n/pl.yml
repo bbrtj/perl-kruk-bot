@@ -13,6 +13,9 @@ str: 'Błąd systemu: nie wygenerowano odpowiedzi.'
 ---
 id: err.no_ai_response
 str: 'Błąd SI: nie udało się uzyskać odpowiedzi po [_1] próbach.'
+---
+id: err.ai_already_queried
+str: 'Wciąż odpowiadam na Twoją poprzednią wiadomość, poczekaj proszę.'
 
 # fetch_webpage tool
 ---

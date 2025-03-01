@@ -164,6 +164,16 @@ sub _system_prompts ($self, $ctx)
 	return %params;
 }
 
+sub _lock_context ($self, $ctx)
+{
+	my $conv = $self->get_conversation($ctx);
+	return !!0 if $conv->locked;
+
+	$conv->lock;
+	$ctx->promise->finally(sub { $conv->unlock });
+	return !!1;
+}
+
 sub _add_ai_query ($self, $ctx)
 {
 	$self->get_conversation($ctx)->add_message('user', $ctx->message);
@@ -387,11 +397,7 @@ sub add_message ($self, $ctx)
 
 sub query ($self, $ctx)
 {
-	if ($self->_handle_commands($ctx)) {
-		return;
-	}
-
-	$self->_add_ai_query($ctx);
+	return if $self->_handle_commands($ctx);
 
 	if (!$self->_can_use_ai($ctx)) {
 		$self->log->info("User @{[$ctx->user]} got refused the use of AI");
@@ -400,6 +406,13 @@ sub query ($self, $ctx)
 		return;
 	}
 
+	if (!$self->_lock_context($ctx)) {
+		$ctx->set_response(_t 'err.ai_already_queried');
+
+		return;
+	}
+
+	$self->_add_ai_query($ctx);
 	$self->requery($ctx);
 }
 

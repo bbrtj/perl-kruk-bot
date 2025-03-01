@@ -34,6 +34,12 @@ has field 'cached_at' => (
 	clearer => -hidden,
 );
 
+has field '_locked_at' => (
+	isa => InstanceOf ['Time::Piece'],
+	writer => -hidden,
+	clearer => -hidden,
+);
+
 has field 'messages' => (
 	isa => ArrayRef [Tuple [Str, ArrayRef]],
 	default => sub { [] },
@@ -42,6 +48,21 @@ has field 'messages' => (
 sub set_cached ($self)
 {
 	$self->_set_cached_at(scalar localtime);
+}
+
+sub locked ($self)
+{
+	return defined $self->_locked_at;
+}
+
+sub lock ($self)
+{
+	$self->_set_locked_at(scalar localtime);
+}
+
+sub unlock ($self)
+{
+	$self->_clear_locked_at;
 }
 
 sub check_cached ($self)

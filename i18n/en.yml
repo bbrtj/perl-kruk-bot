@@ -13,6 +13,9 @@ str: 'System failure: did not get a response.'
 ---
 id: err.no_ai_response
 str: 'AI failure: tried [_1] times but did not get a response.'
+---
+id: err.ai_already_queried
+str: 'I''m still responding to your last message, please wait.'
 
 # fetch_webpage tool
 ---
