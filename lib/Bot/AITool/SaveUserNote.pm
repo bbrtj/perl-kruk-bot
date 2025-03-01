@@ -15,7 +15,7 @@ sub _build_definition ($self)
 	return {
 		name => $self->name,
 		description =>
-			q{Save a note about the user for later. Use when you make an observation about the user or the user tells you an interesting fact about them.},
+			q{Save a note about the user for later. Use spontaneously when you make an observation about the user or the user tells you an interesting fact about them.},
 		input_schema => {
 			type => 'object',
 			required => ['note'],
