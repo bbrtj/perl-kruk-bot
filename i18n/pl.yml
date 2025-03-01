@@ -34,7 +34,7 @@ str: 'bazgrze'
 
 # save_user_note tool
 ---
-id: tool.save_self_note.msg.info
+id: tool.save_user_note.msg.info
 str: 'notuje'
 
 # General commands
