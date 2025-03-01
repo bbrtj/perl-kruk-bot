@@ -47,7 +47,8 @@ task deploy => sub {
 	}
 
 	say 'Restarting ubic...';
-	run "source $perlbrew_bashrc && ubic restart $system_name";
+	run "source $perlbrew_bashrc && ubic restart $system_name-irc";
+	run "source $perlbrew_bashrc && ubic restart $system_name-web";
 };
 
 # ex: ft=perl
