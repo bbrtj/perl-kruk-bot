@@ -99,7 +99,7 @@ sub failure ($self, %params)
 		return;
 	}
 
-	$params{max_tries} //= 3;
+	$params{max_tries} //= 4;
 	my $retries = $self->retries;
 	$self->_set_retries(++$retries);
 	$self->set_response(_t 'err.no_ai_response', $params{max_tries})

@@ -396,7 +396,7 @@ sub _query ($self, $ctx)
 		},
 		sub (@err) {
 			$self->log->error("AI query connection error: @err");
-			return {retry => !!0};
+			die {retry => !!0};
 		}
 	);
 }
@@ -436,7 +436,7 @@ sub requery ($self, $ctx)
 		undef,
 		sub ($status) {
 			$ctx->failure(%$status);
-			Mojo::IOLoop->timer(2 => sub { $self->requery($ctx) })
+			Mojo::IOLoop->timer(($ctx->retries * 2), sub { $self->requery($ctx) })
 				unless $ctx->has_response;
 		}
 	);
