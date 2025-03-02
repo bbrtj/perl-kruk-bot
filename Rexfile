@@ -27,7 +27,7 @@ task deploy => sub {
 
 	say 'Uploading files...';
 	sync_up $cwd, "$build_dir/current", {
-		exclude => [qw(.* .git sqitch* *.db t cpanfile* Rexfile* local tools)],
+		exclude => [qw(.* .git sqitch* *.db t cpanfile* Rexfile* local tools art)],
 	};
 
 	file "$build_dir/$_", source => "$cwd/$_", on_change => sub { $modules_changed = !!1 }

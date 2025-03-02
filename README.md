@@ -1,5 +1,9 @@
 # Kruk AI chatbot
 
+<div align="center" width="100%">
+    <p><img width="25%" src="art/logo.png" alt="logo"></p>
+</div>
+
 ## Overview
 
 Kruk is a multi-purpose chatbot built in Perl. It has both predefined commands as well as AI interaction.
