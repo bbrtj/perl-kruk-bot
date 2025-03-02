@@ -6,6 +6,7 @@ use Mooish::Base;
 use Mojo::UserAgent;
 use Mojo::Template;
 use Mojo::Promise;
+use Mojo::IOLoop;
 use List::Util qw(any);
 use Regexp::Common qw(RE_ALL);
 
@@ -435,7 +436,8 @@ sub requery ($self, $ctx)
 		undef,
 		sub ($status) {
 			$ctx->failure(%$status);
-			$self->requery($ctx);
+			Mojo::IOLoop->timer(2 => sub { $self->requery($ctx) })
+				unless $ctx->has_response;
 		}
 	);
 }
