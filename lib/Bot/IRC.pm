@@ -84,6 +84,10 @@ sub dispatch ($self, $msg)
 
 sub save_snippet ($self, $snippet)
 {
+	if ($snippet !~ /\v/ && length $snippet < 80) {
+		return "`$snippet`";
+	}
+
 	my $type;
 	if ($snippet =~ s{^(\w+)\v}{}) {
 		$type = $1;

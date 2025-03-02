@@ -51,5 +51,10 @@ subtest 'should store snippet syntax' => sub {
 	}
 };
 
+subtest 'should not store short snippet' => sub {
+	my $result = $irc->save_snippet($short_text);
+	is $result, "`$short_text`", 'short snippet ok';
+};
+
 done_testing;
 
