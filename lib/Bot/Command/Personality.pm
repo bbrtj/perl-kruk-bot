@@ -5,6 +5,7 @@ use v5.40;
 use Mooish::Base;
 use List::Util qw(any);
 
+use Kruk;
 use Bot::I18N;
 
 extends 'Bot::Command';
@@ -36,7 +37,7 @@ sub alter ($self, $ctx, @args)
 
 sub list ($self)
 {
-	return map { /personality\.(\w+)\.ep/; $1 } glob 'prompts/personality.*.ep';
+	return map { /personality\.(\w+)\.ep/; $1 } glob Kruk->root_dir->child('prompts/personality.*.ep');
 }
 
 sub current ($self, $ctx)
