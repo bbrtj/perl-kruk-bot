@@ -68,7 +68,7 @@ sub dispatch ($self, $msg)
 	my ($user) = $msg->{prefix} =~ /^(@{[NICK_RE]})/;
 
 	my $for_me = $is_private;
-	if ($line =~ /^(@{[NICK_RE]}):/) {
+	if (!$for_me && $line =~ /^(@{[NICK_RE]}):/) {
 		$for_me = fc $1 eq fc $conf->{nick};
 		$line =~ s/^\Q$conf->{nick}:\E//i
 			if $for_me;
