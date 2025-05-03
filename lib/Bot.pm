@@ -348,7 +348,7 @@ sub _query ($self, $ctx)
 
 	my $data = {
 		$self->_system_prompts($ctx),
-		max_tokens => 1024,
+		max_tokens => 2048,
 		messages => $self->get_conversation($ctx)->api_call_format_messages,
 		tool_choice => {type => 'auto'},
 		tools => [
