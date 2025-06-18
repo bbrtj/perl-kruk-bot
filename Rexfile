@@ -20,13 +20,10 @@ task deploy => sub {
 
 	say 'Creating directory structure...';
 	file $build_dir, ensure => 'directory';
-	file "$build_dir/previous", ensure => 'absent';
-	rename "$build_dir/current", "$build_dir/previous"
-		if is_dir "$build_dir/current";
-	file "$build_dir/current", ensure => 'directory';
+	file "$build_dir/next", ensure => 'directory';
 
 	say 'Uploading files...';
-	sync_up $cwd, "$build_dir/current", {
+	sync_up $cwd, "$build_dir/next", {
 		exclude => [qw(.* .git sqitch* *.db t cpanfile* Rexfile* local tools art)],
 	};
 
@@ -45,6 +42,11 @@ task deploy => sub {
 			&& carmel rollout
 		CARMEL
 	}
+
+	file "$build_dir/previous", ensure => 'absent';
+	rename "$build_dir/current", "$build_dir/previous"
+		if is_dir "$build_dir/current";
+	rename "$build_dir/next", "$build_dir/current";
 
 	say 'Restarting ubic...';
 	run "source $perlbrew_bashrc && ubic restart $system_name-irc";
