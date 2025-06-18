@@ -10,6 +10,8 @@ use Time::Piece;
 use Bot::I18N;
 use Bot::Conversation::Config;
 
+use constant MAX_TRIES => 5;
+
 has param 'channel' => (
 	isa => Maybe [SimpleStr],
 	default => undef,
@@ -99,7 +101,7 @@ sub failure ($self, %params)
 		return;
 	}
 
-	$params{max_tries} //= 4;
+	$params{max_tries} //= MAX_TRIES;
 	my $retries = $self->retries;
 	$self->_set_retries(++$retries);
 	$self->set_response(_t 'err.no_ai_response', $params{max_tries})

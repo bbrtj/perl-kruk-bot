@@ -436,7 +436,7 @@ sub requery ($self, $ctx)
 		undef,
 		sub ($status) {
 			$ctx->failure(%$status);
-			Mojo::IOLoop->timer(($ctx->retries * 2), sub { $self->requery($ctx) })
+			Mojo::IOLoop->timer(($ctx->retries**2) * 2, sub { $self->requery($ctx) })
 				unless $ctx->has_response;
 		}
 	);
