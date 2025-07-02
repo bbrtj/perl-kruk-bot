@@ -13,6 +13,7 @@ use Web;
 
 use constant MAX_IRC_MESSAGE_LENGTH => 430;
 use constant NICK_RE => qr{[^ ,*?!@.:#&~+%][^ ,*?!@.:]*};
+use constant TIMEOUT => 300;
 
 has param 'config' => (
 	isa => HashRef,
@@ -54,6 +55,12 @@ has field 'log' => (
 	default => sub {
 		Bot::Log->new;
 	},
+);
+
+has field 'connected' => (
+	isa => Bool,
+	writer => 1,
+	default => !!0,
 );
 
 sub dispatch ($self, $msg)
@@ -179,6 +186,43 @@ sub configure ($self, $react_sub)
 		}
 	);
 
+	$irc->on(
+		error => sub ($, $err) {
+			$self->log->error($err);
+		}
+	);
+
+	$irc->on(
+		close => sub {
+			$self->set_connected(!!0);
+			$self->log->warning('disconnected');
+			$self->connect;
+		}
+	);
+
+	my $ping = undef;
+	$irc->ioloop->recurring(
+		(TIMEOUT) => sub {
+			return unless $self->connected;
+
+			if (defined $ping) {
+				$self->log->warning('connection lost');
+				$self->irc_instance->disconnect;
+				undef $ping;
+			}
+			else {
+				$irc->write('ping' => $self->config->{server});
+				$ping = !!1;
+			}
+		}
+	);
+
+	$irc->on(
+		irc_pong => sub ($, @arg) {
+			undef $ping;
+		}
+	);
+
 	$irc->ioloop->recurring(
 		60 => sub {
 			my $threshold = time - $self->snippet_lifetime;
@@ -198,10 +242,18 @@ sub configure ($self, $react_sub)
 
 sub connect ($self)
 {
-	$self->irc_instance->connect(
+	my $irc = $self->irc_instance;
+	$irc->connect(
 		sub ($irc, $err) {
-			$self->log->info('connected');
-			warn $err if $err;
+			if ($err) {
+				$self->log->error("could not connect: $err");
+				$self->log->info("reconnecting in 10...");
+				$irc->ioloop->timer(10 => sub { $self->connect });
+			}
+			else {
+				$self->log->info('connected');
+				$self->set_connected(!!1);
+			}
 		}
 	);
 }
