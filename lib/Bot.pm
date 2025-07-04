@@ -184,7 +184,7 @@ sub _lock_context ($self, $ctx)
 
 sub _add_ai_query ($self, $ctx)
 {
-	$self->get_conversation($ctx)->add_message('user', $ctx->message);
+	$self->get_conversation($ctx)->add_message('user', join ': ', $ctx->user, $ctx->message);
 }
 
 sub _add_ai_response ($self, $ctx)
@@ -290,7 +290,14 @@ sub get_context ($self, @params)
 
 sub get_conversation ($self, $ctx)
 {
-	my $key = sprintf '%s -> %s', $ctx->channel // '', $ctx->user;
+	my $key;
+	if ($ctx->channel) {
+		$key = sprintf 'channel -> %s', $ctx->channel;
+	}
+	else {
+		$key = sprintf 'user -> %s', $ctx->user;
+	}
+
 	my $conv = $self->conversations->{$key} //= Bot::Conversation->new(
 		config => $self->config->clone,
 		conversation_lifetime => $self->conversation_lifetime,
