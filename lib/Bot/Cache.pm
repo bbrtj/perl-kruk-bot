@@ -52,12 +52,7 @@ sub process_cache ($self, $ctx, $request_data)
 	my @prompts = map { $self->_extract_prompts($request_data->{$_}, $_) } CACHE_ORDER->@*;
 	my $cache_threshold = $request_data->{model} =~ /haiku/i ? MIN_CACHE_TOKENS_HAIKU : MIN_CACHE_TOKENS_SONNET;
 	my $tokens = $prompts[0] && $prompts[0][2] eq CACHE_ORDER->[0] ? TOOLS_PROMPT_TOKENS : 0;
-
-	# count breakpoints set in prompts
 	my $breakpoints = 0;
-	foreach my $prompt (@prompts) {
-		$breakpoints += exists $prompt->[1]{cache_control} && defined $prompt->[1]{cache_control}{type};
-	}
 
 	# up to 2 cache breakpoints in messages section
 	my $cache_after_message = int($ctx->config->history_size / 2);

@@ -4,6 +4,7 @@ use v5.40;
 
 use Mooish::Base;
 use Time::Piece;
+use Storable qw(dclone);
 
 use Bot::Cache;
 use Bot::Conversation::Config;
@@ -114,6 +115,6 @@ sub clear ($self)
 
 sub api_call_format_messages ($self)
 {
-	return [map { +{role => $_->[0], content => $_->[1]} } $self->messages->@*];
+	return dclone [map { +{role => $_->[0], content => $_->[1]} } $self->messages->@*];
 }
 
