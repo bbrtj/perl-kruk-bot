@@ -77,13 +77,16 @@ str: 'oblicza wyrażenie matematyczne. Składnia: ```[_1]```'
 # chat command
 ---
 id: command.chat.help.syntax
-str: '~[clear~]'
+str: '~[clear|read~]'
 ---
 id: command.chat.help.description
 str: 'pokaż lub modyfikuj szczegóły obecnego czatu'
 ---
 id: command.chat.msg.cleared
 str: 'Czat wyczyszczony.'
+---
+id: command.chat.msg.read
+str: 'Czat odczytany.'
 ---
 id: command.chat.msg.info
 str: 'Twoja obecna rozmowa rozpoczęła się [_1] oraz ma w sobie [_2] wiadomości.'
@@ -161,11 +164,6 @@ str: 'Osobowość zmodyfikowana.'
 ---
 id: command.personality.err.invalid
 str: 'nie ma takiej osobowości'
-
-# sudo command
----
-id: command.sudo.help.description
-str: 'uzyskaj dostęp do funkcji bota naruszających prywatność'
 
 # timer command
 ---

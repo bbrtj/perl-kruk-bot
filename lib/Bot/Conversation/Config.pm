@@ -6,9 +6,9 @@ use Mooish::Base;
 
 # all configuration should have defaults
 
-has param 'sudo' => (
-	isa => Bool,
-	default => !!0,
+has param 'chat_log' => (
+	isa => Str,
+	default => '',
 	writer => 1,
 );
 

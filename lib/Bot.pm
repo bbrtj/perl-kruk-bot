@@ -70,7 +70,6 @@ has field 'tools' => (
 	isa => HashRef [InstanceOf ['Bot::AITool']],
 	default => sub ($self) {
 		return {
-			Bot::AITool::ReadChat->register($self),
 			Bot::AITool::SaveSelfNote->register($self),
 			Bot::AITool::SaveUserNote->register($self),
 			Bot::AITool::FetchWebpage->register($self),
@@ -87,7 +86,6 @@ has field 'commands' => (
 			Bot::Command::Notes->register($self),
 			Bot::Command::Personality->register($self),
 			Bot::Command::Chat->register($self),
-			Bot::Command::Sudo->register($self),
 			Bot::Command::Calc->register($self),
 			Bot::Command::Timer->register($self),
 		};
@@ -279,7 +277,7 @@ sub _can_use_ai ($self, $ctx)
 sub get_context ($self, @params)
 {
 	my $ctx = Bot::Context->new(@params);
-	$ctx->set_config($self->get_conversation($ctx)->config->clone);
+	$ctx->set_config($self->get_conversation($ctx)->config);
 
 	if (my $hook = $self->context_sub) {
 		$hook->($ctx);

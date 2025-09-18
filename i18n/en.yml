@@ -77,13 +77,16 @@ str: 'evaluate a mathematical expression. Syntax: ```[_1]```'
 # chat command
 ---
 id: command.chat.help.syntax
-str: '~[clear~]'
+str: '~[clear|read~]'
 ---
 id: command.chat.help.description
 str: 'show or modify details about your chat'
 ---
 id: command.chat.msg.cleared
 str: 'Chat cleared.'
+---
+id: command.chat.msg.read
+str: 'Chat read.'
 ---
 id: command.chat.msg.info
 str: 'Your current conversation has started [_1] and has [_2] messages in it.'
@@ -161,11 +164,6 @@ str: 'Personality modified.'
 ---
 id: command.personality.err.invalid
 str: 'no such personality'
-
-# sudo command
----
-id: command.sudo.help.description
-str: 'access privacy-violating bot functions'
 
 # timer command
 ---
