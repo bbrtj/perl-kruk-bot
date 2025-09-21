@@ -224,6 +224,12 @@ sub configure ($self, $react_sub)
 	);
 
 	$irc->ioloop->recurring(
+		60 * 60 => sub {
+			$irc->write(nick => $self->config->{nick});
+		}
+	);
+
+	$irc->ioloop->recurring(
 		60 => sub {
 			my $threshold = time - $self->snippet_lifetime;
 
