@@ -32,6 +32,11 @@ has param 'config' => (
 	default => sub { {} },
 );
 
+has param 'max_tokens' => (
+	isa => PositiveInt,
+	default => sub { $ENV{KRUK_MAX_TOKENS} // 2000 },
+);
+
 has param 'conversation_lifetime' => (
 	isa => PositiveInt,
 	default => sub { $ENV{KRUK_CONVERSATION_LIFETIME} // 120 },
@@ -353,7 +358,7 @@ sub _query ($self, $ctx)
 
 	my $data = {
 		$self->_system_prompts($ctx),
-		max_tokens => 2048,
+		max_tokens => $self->max_tokens,
 		messages => $self->get_conversation($ctx)->api_call_format_messages,
 		tool_choice => {type => 'auto'},
 		tools => [

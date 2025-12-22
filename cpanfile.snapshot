@@ -1900,6 +1900,34 @@ DISTRIBUTIONS
       strict 0
       version 0.83
       warnings 0
+  Storage-Abstract-0.007
+    pathname: B/BR/BRTASTIC/Storage-Abstract-0.007.tar.gz
+    provides:
+      Storage::Abstract 0.007
+      Storage::Abstract::Driver 0.007
+      Storage::Abstract::Driver::Composite 0.007
+      Storage::Abstract::Driver::Directory 0.007
+      Storage::Abstract::Driver::Memory 0.007
+      Storage::Abstract::Driver::Null 0.007
+      Storage::Abstract::Driver::Subpath 0.007
+      Storage::Abstract::Driver::Superpath 0.007
+      Storage::Abstract::Handle 0.007
+      Storage::Abstract::Role::Driver::Basic 0.007
+      Storage::Abstract::Role::Driver::Meta 0.007
+      Storage::Abstract::X 0.007
+      Storage::Abstract::X::HandleError 0.007
+      Storage::Abstract::X::NotFound 0.007
+      Storage::Abstract::X::PathError 0.007
+      Storage::Abstract::X::Readonly 0.007
+      Storage::Abstract::X::StorageError 0.007
+    requirements:
+      ExtUtils::MakeMaker 0
+      List::Util 1.33
+      Moo 2
+      Mooish::AttributeBuilder 1.002
+      Type::Tiny 2
+      namespace::autoclean 0
+      perl 5.014
   Sub-Exporter-0.991
     pathname: R/RJ/RJBS/Sub-Exporter-0.991.tar.gz
     provides:

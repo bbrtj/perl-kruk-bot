@@ -41,6 +41,11 @@ has field 'response_extras' => (
 	default => sub { [] },
 );
 
+has field 'on_response_extra' => (
+	isa => CodeRef,
+	writer => 1,
+);
+
 has field 'response' => (
 	isa => Str,
 	writer => -hidden,
@@ -68,6 +73,9 @@ sub set_response ($self, $text)
 sub add_to_response ($self, $text)
 {
 	push $self->response_extras->@*, $text;
+
+	$self->on_response_extra->($text)
+		if $self->on_response_extra;
 }
 
 sub full_response ($self)
