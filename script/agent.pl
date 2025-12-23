@@ -18,6 +18,7 @@ die 'bad directory'
 	unless $directory && -d $directory;
 
 $ENV{KRUK_PRODUCTION} = true;
+$ENV{MOJO_INACTIVITY_TIMEOUT} = 300;
 my $bot = Bot->new(
 	environment => 'agent',
 	max_tokens => 64000,
