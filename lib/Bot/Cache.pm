@@ -23,18 +23,14 @@ sub _extract_prompts ($self, $object, $where)
 	my $ref = ref $object;
 	my @results;
 	if ($ref eq 'HASH') {
-		my $got_key;
 		foreach my $key (sort keys $object->%*) {
-			if (any { $key eq $_ } TEXT_OBJECTS->@*) {
-				$got_key = $key;
+			if (!ref $object->{$key} && any { $key eq $_ } TEXT_OBJECTS->@*) {
+				push @results, [$key, $object, $where]
 			}
 			else {
 				push @results, $self->_extract_prompts($object->{$key}, $where);
 			}
 		}
-
-		push @results, [$got_key, $object, $where]
-			if $got_key;
 	}
 	elsif ($ref eq 'ARRAY') {
 		foreach my $value ($object->@*) {
@@ -53,15 +49,14 @@ sub process_cache ($self, $ctx, $request_data)
 	my $cache_threshold = $request_data->{model} =~ /haiku/i ? MIN_CACHE_TOKENS_HAIKU : MIN_CACHE_TOKENS_SONNET;
 	my $tokens = $prompts[0] && $prompts[0][2] eq CACHE_ORDER->[0] ? TOOLS_PROMPT_TOKENS : 0;
 	my $breakpoints = 0;
-
-	# up to 2 cache breakpoints in messages section
-	my $cache_after_message = int($ctx->config->history_size / 2);
+	my $last_breakpoint_tokens = 0;
 
 	my sub add_breakpoint ($prompt)
 	{
 		return !!1 if defined $prompt->[1]{cache_control}{type};
 		return !!0 if $breakpoints == MAX_BREAKPOINTS;
 		$breakpoints += 1;
+		$last_breakpoint_tokens = $tokens;
 
 		$self->bot_instance->log->debug("Setting a cache breakpoint in $prompt->[2] block");
 		$prompt->[1]{cache_control}{type} = 'ephemeral';
@@ -87,8 +82,8 @@ sub process_cache ($self, $ctx, $request_data)
 			# this prompt alone is big enough to justify caching
 			my $big_prompt = $tokens_in_prompt > $cache_threshold;
 
-			# message at cache checkpoint, and the prompt is big enough
-			my $checkpoint_message = $message_number % $cache_after_message == 0 && $tokens > $cache_threshold;
+			# if we saved up enough tokens, we may cache
+			my $checkpoint_message = $tokens - $last_breakpoint_tokens > $cache_threshold * 2;
 
 			if ($big_prompt || $checkpoint_message) {
 				$messages_cached = add_breakpoint($prompt) || $messages_cached;

@@ -22,9 +22,6 @@ my $bot = Bot->new(
 	environment => 'agent',
 	max_tokens => 64000,
 	conversation_lifetime => 99999,
-	config => {
-		history_size => 500,
-	},
 );
 
 $bot->tools->%* = (
