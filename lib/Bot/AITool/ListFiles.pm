@@ -39,10 +39,12 @@ sub _build_definition ($self)
 					type => 'string',
 					description =>
 						'Explain why you are performing this action, so that user will know what you are doing',
+					example => 'searching for location of MyModule',
 				},
 				extensions => {
 					type => 'string',
 					description => 'comma-separated list of file extensions to include, without dot',
+					example => 'pm,t',
 				},
 			},
 		},
@@ -51,7 +53,7 @@ sub _build_definition ($self)
 
 sub runner ($self, $ctx, $input)
 {
-	$ctx->add_to_response($input->{reason});
+	$ctx->add_to_response("searching for $input->{extensions}: $input->{reason}");
 
 	my @files = $self->storage->list->@*;
 

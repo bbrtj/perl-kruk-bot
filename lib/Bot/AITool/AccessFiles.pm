@@ -39,6 +39,7 @@ sub _build_definition ($self)
 					type => 'string',
 					description =>
 						'Explain why you are performing this action, so that user will know what you are doing',
+					example => 'analyzing the source of MyModule',
 				},
 				file_path => {
 					type => 'string',
@@ -56,10 +57,10 @@ sub _build_definition ($self)
 
 sub runner ($self, $ctx, $input)
 {
-	$ctx->add_to_response($input->{reason});
-
 	my $file = $input->{file_path};
 	my $new_content = $input->{contents};
+
+	$ctx->add_to_response("accessing $file: $input->{reason}");
 
 	try {
 		if (defined $new_content) {

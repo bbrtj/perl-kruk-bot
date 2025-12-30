@@ -25,7 +25,7 @@ sub _extract_prompts ($self, $object, $where)
 	if ($ref eq 'HASH') {
 		foreach my $key (sort keys $object->%*) {
 			if (!ref $object->{$key} && any { $key eq $_ } TEXT_OBJECTS->@*) {
-				push @results, [$key, $object, $where]
+				push @results, [$key, $object, $where];
 			}
 			else {
 				push @results, $self->_extract_prompts($object->{$key}, $where);

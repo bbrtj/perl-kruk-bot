@@ -33,13 +33,8 @@ sub _build_definition ($self)
 			q{Rename files by moving them from one location to another},
 		input_schema => {
 			type => 'object',
-			required => ['reason', 'extensions'],
+			required => ['old_name', 'new_name'],
 			properties => {
-				reason => {
-					type => 'string',
-					description =>
-						'Explain why you are performing this action, so that user will know what you are doing',
-				},
 				old_name => {
 					type => 'string',
 					description => 'Name of the existing file',
@@ -55,7 +50,7 @@ sub _build_definition ($self)
 
 sub runner ($self, $ctx, $input)
 {
-	$ctx->add_to_response($input->{reason});
+	$ctx->add_to_response("moving $input->{old_name} to $input->{new_name}");
 
 	try {
 		my $fh = $self->storage->retrieve($input->{old_name});
