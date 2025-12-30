@@ -59,8 +59,9 @@ sub runner ($self, $ctx, $input)
 {
 	my $file = $input->{file_path};
 	my $new_content = $input->{contents};
+	my $type_text = defined $new_content ? 'writing' : 'reading';
 
-	$ctx->add_to_response("accessing $file: $input->{reason}");
+	$ctx->add_to_response("$type_text $file: $input->{reason}");
 
 	try {
 		if (defined $new_content) {
