@@ -22,9 +22,13 @@ if (-f "$directory/.agent") {
 	push @prompts, path("$directory/.agent")->slurp;
 }
 
+# unique user name for user notes
+my $user = 'agent_user_' . path($directory)->basename;
+
 $ENV{KRUK_PRODUCTION} = true;
 $ENV{MOJO_INACTIVITY_TIMEOUT} = 300;
 my $bot = Bot->new(
+	trusted_users => [$user],
 	environment => 'agent',
 	extra_prompts => \@prompts,
 	max_tokens => 64000,
@@ -38,9 +42,6 @@ $bot->tools->%* = (
 	Bot::AITool::ListFiles->register($bot, directory => $directory),
 	Bot::AITool::MoveFiles->register($bot, directory => $directory),
 );
-
-# unique user name for user notes
-my $user = 'agent_user_' . path($directory)->basename;
 
 while ('talking with AI') {
 	print "> ";
