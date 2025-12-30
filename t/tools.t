@@ -12,6 +12,7 @@ my $bot = Bot->new(environment => 'test');
 $bot->tools->%* = (
 	$bot->tools->%*,
 	Bot::AITool::Perldoc->register($bot),
+	Bot::AITool::ListFiles->register($bot, directory => '.'),
 );
 
 sub build_context ($message)
@@ -146,7 +147,7 @@ subtest 'should truncate a very long page' => sub {
 };
 
 subtest 'should get a perldoc' => sub {
-	my $ctx = build_context('go to https://perldoc.perl.org/Locale::Maketext');
+	my $ctx = build_context('read UNIVERSAL perldoc');
 	my $p = $bot->use_tool(
 		$ctx, {
 			name => 'perldoc',
@@ -162,6 +163,27 @@ subtest 'should get a perldoc' => sub {
 	my $last_message = $conv->messages->[-1];
 	is $last_message->[0], 'user', 'last entry is user role ok';
 	like $last_message->[1][0]{content}[0]{text}, qr/=head1 SYNOPSIS/, 'module content ok';
+};
+
+subtest 'should list files' => sub {
+	my $ctx = build_context('list files in this project');
+	my $p = $bot->use_tool(
+		$ctx, {
+			name => 'list_files',
+			input => {
+				reason => 'testing',
+				extensions => 't,pm',
+			}
+		}
+	);
+
+	$p->wait if $p;
+
+	my $conv = $bot->get_conversation($ctx);
+	my $last_message = $conv->messages->[-1];
+	is $last_message->[0], 'user', 'last entry is user role ok';
+	like $last_message->[1][0]{content}[0]{text}, qr{t/tools.t}, 'module content ok (tools.t)';
+	like $last_message->[1][0]{content}[0]{text}, qr{lib/Bot.pm}, 'module content ok (Bot.pm)';
 };
 
 done_testing;

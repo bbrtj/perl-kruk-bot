@@ -63,9 +63,12 @@ sub runner ($self, $ctx, $input)
 	# exclude common dirs
 	@files = grep { $_ !~ m{^local/|^node_modules/} } @files;
 
+	my @orig_files = @files;
+	@files = ();
+
 	# include extensions
 	foreach my $ext (split /,/, $input->{extensions}) {
-		@files = grep { $_ =~ m{\.\Q$ext\E$} } @files;
+		@files = (@files, grep { $_ =~ m{\.\Q$ext\E$} } @orig_files);
 	}
 
 	return join "\n", @files;
