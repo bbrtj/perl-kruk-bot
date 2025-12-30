@@ -54,6 +54,10 @@ has param 'trusted_users' => (
 	}
 );
 
+has option 'extra_prompts' => (
+	isa => ArrayRef [Str],
+);
+
 has field 'claude_api_key' => (
 	isa => Maybe [SimpleStr],
 	default => sub {
@@ -165,6 +169,9 @@ sub _system_prompts ($self, $ctx)
 	catch ($e) {
 		die $e if $e !~ /no such file or directory/i;
 	}
+
+	push @prompts, $self->extra_prompts->@*
+		if $self->has_extra_prompts;
 
 	push @prompts, grep { length }
 		$self->notes->dump(prefix => 'Here is your diary:'),

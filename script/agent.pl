@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 
 use v5.40;
-use Mojo::File qw(curfile);
+use Mojo::File qw(curfile path);
 use lib curfile->dirname->dirname->child('lib')->to_string;
 
 use Env::Dot;
@@ -17,22 +17,29 @@ my $directory = shift();
 die 'bad directory'
 	unless $directory && -d $directory;
 
+my @prompts;
+if (-f "$directory/.agent") {
+	push @prompts, path("$directory/.agent")->slurp;
+}
+
 $ENV{KRUK_PRODUCTION} = true;
 $ENV{MOJO_INACTIVITY_TIMEOUT} = 300;
 my $bot = Bot->new(
 	environment => 'agent',
+	extra_prompts => \@prompts,
 	max_tokens => 64000,
 	conversation_lifetime => 99999,
 );
 
 $bot->tools->%* = (
-	Bot::AITool::FetchWebpage->register($bot),
+	Bot::AITool::SaveUserNote->register($bot),
 	Bot::AITool::AccessFiles->register($bot, directory => $directory),
 	Bot::AITool::ListFiles->register($bot, directory => $directory),
 	Bot::AITool::MoveFiles->register($bot, directory => $directory),
 );
 
-my $user = $bot->owner;
+# unique user name for user notes
+my $user = 'agent_user_' . path($directory)->basename;
 
 while ('talking with AI') {
 	print "> ";
