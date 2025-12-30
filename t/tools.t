@@ -5,7 +5,14 @@ use Bot;
 use v5.40;
 use utf8;
 
+use Bot::AITool::Perldoc;
+
 my $bot = Bot->new(environment => 'test');
+
+$bot->tools->%* = (
+	$bot->tools->%*,
+	Bot::AITool::Perldoc->register($bot),
+);
 
 sub build_context ($message)
 {
@@ -136,6 +143,25 @@ subtest 'should truncate a very long page' => sub {
 	is length $last_message->[1][0]{content}[0]{text}, 20000, 'website data length ok';
 	like $last_message->[1][0]{content}[0]{text}, qr/do not retry fetching the page./i, 'website data truncated ok';
 	like $ctx->response_extras->[0], qr/truncated to \d+%/, 'user informed ok';
+};
+
+subtest 'should get a perldoc' => sub {
+	my $ctx = build_context('go to https://perldoc.perl.org/Locale::Maketext');
+	my $p = $bot->use_tool(
+		$ctx, {
+			name => 'perldoc',
+			input => {
+				module => 'UNIVERSAL',
+			}
+		}
+	);
+
+	$p->wait if $p;
+
+	my $conv = $bot->get_conversation($ctx);
+	my $last_message = $conv->messages->[-1];
+	is $last_message->[0], 'user', 'last entry is user role ok';
+	like $last_message->[1][0]{content}[0]{text}, qr/=head1 SYNOPSIS/, 'module content ok';
 };
 
 done_testing;

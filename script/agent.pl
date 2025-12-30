@@ -33,6 +33,7 @@ my $bot = Bot->new(
 
 $bot->tools->%* = (
 	Bot::AITool::SaveUserNote->register($bot),
+	Bot::AITool::Perldoc->register($bot),
 	Bot::AITool::AccessFiles->register($bot, directory => $directory),
 	Bot::AITool::ListFiles->register($bot, directory => $directory),
 	Bot::AITool::MoveFiles->register($bot, directory => $directory),
