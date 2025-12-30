@@ -53,7 +53,7 @@ sub process_cache ($self, $ctx, $request_data)
 
 	my sub add_breakpoint ($prompt)
 	{
-		return !!1 if defined $prompt->[1]{cache_control}{type};
+		return !!1 if exists $prompt->[1]{cache_control} && defined $prompt->[1]{cache_control}{type};
 		return !!0 if $breakpoints == MAX_BREAKPOINTS;
 		$breakpoints += 1;
 		$last_breakpoint_tokens = $tokens;
