@@ -33,14 +33,8 @@ sub _build_definition ($self)
 			q{Lists files available in this project},
 		input_schema => {
 			type => 'object',
-			required => ['reason', 'extensions'],
+			required => ['extensions'],
 			properties => {
-				reason => {
-					type => 'string',
-					description =>
-						'Explain why you are performing this action, so that user will know what you are doing',
-					example => 'searching for location of MyModule',
-				},
 				extensions => {
 					type => 'string',
 					description => 'comma-separated list of file extensions to include, without dot',
@@ -53,7 +47,7 @@ sub _build_definition ($self)
 
 sub runner ($self, $ctx, $input)
 {
-	$ctx->add_to_response("searching for $input->{extensions}: $input->{reason}");
+	$ctx->add_to_response("searching for $input->{extensions}");
 
 	my @files = $self->storage->list->@*;
 

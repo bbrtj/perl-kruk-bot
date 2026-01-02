@@ -171,7 +171,6 @@ subtest 'should list files' => sub {
 		$ctx, {
 			name => 'list_files',
 			input => {
-				reason => 'testing',
 				extensions => 't,pm',
 			}
 		}

@@ -33,14 +33,8 @@ sub _build_definition ($self)
 			q{Read or write a file on user's machine. Use this to understand the environment better, or to output contents to a file},
 		input_schema => {
 			type => 'object',
-			required => ['reason', 'file_path'],
+			required => ['file_path'],
 			properties => {
-				reason => {
-					type => 'string',
-					description =>
-						'Explain why you are performing this action, so that user will know what you are doing',
-					example => 'analyzing the source of MyModule',
-				},
 				file_path => {
 					type => 'string',
 					description => 'Relative path to a file inside this project. Uses unix directory separators',
@@ -61,7 +55,7 @@ sub runner ($self, $ctx, $input)
 	my $new_content = $input->{contents};
 	my $type_text = defined $new_content ? 'writing' : 'reading';
 
-	$ctx->add_to_response("$type_text $file: $input->{reason}");
+	$ctx->add_to_response("$type_text $file");
 
 	try {
 		if (defined $new_content) {
