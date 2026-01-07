@@ -6,7 +6,7 @@ use Rex::Commands::PerlSync;
 
 my $system_name = 'kruk';
 my $perlbrew_bashrc = $ENV{REMOVE_PERLBREW_BASHRC} // '~/perl5/perlbrew/etc/bashrc';
-my $remote_perl = $ENV{REMOTE_PERL} // 'perl-5.40.0';
+my $remote_perl = $ENV{REMOTE_PERL} // 'perl-5.42.0';
 
 Rex::Config->set_timeout(10);
 
