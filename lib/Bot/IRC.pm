@@ -45,11 +45,6 @@ has field 'web_instance' => (
 	default => sub { Web->new },
 );
 
-has field 'snippet_lifetime' => (
-	isa => PositiveInt,
-	default => sub { ($ENV{KRUK_SNIPPET_LIFETIME} // 1440) * 60 },
-);
-
 has field 'log' => (
 	isa => InstanceOf ['Bot::Log'],
 	default => sub {
@@ -226,22 +221,6 @@ sub configure ($self, $react_sub)
 	$irc->ioloop->recurring(
 		60 * 60 => sub {
 			$irc->write(nick => $self->config->{nick});
-		}
-	);
-
-	$irc->ioloop->recurring(
-		60 => sub {
-			my $threshold = time - $self->snippet_lifetime;
-
-			my $expired = Bot::Schema::Snippet::Manager->get_snippets(
-				query => [
-					created_at => {lt => $threshold},
-				],
-			);
-
-			foreach my $item (@$expired) {
-				$item->delete;
-			}
 		}
 	);
 }

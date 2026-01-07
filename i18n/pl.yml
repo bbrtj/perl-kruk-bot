@@ -182,3 +182,17 @@ str: 'maksymalny czas minutnika to [_1] sekund'
 id: command.timer.msg.registered
 str: 'Minutnik został nastawiony.'
 
+# logs command
+---
+id: command.logs.help.syntax
+str: '~[<kanał> <rozstaw_godzinowy>~]'
+---
+id: command.logs.help.description
+str: 'uzyskaj link do logów czatu kanału z podanego rozstawu godzin'
+---
+id: command.logs.err.bad_channel
+str: '#kanał musi zostać podany w prywatnej rozmowie'
+---
+id: command.logs.err.bad_offset
+str: 'rozstaw musi być pozytywny i nie większy niż [_1]'
+

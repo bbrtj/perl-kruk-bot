@@ -182,3 +182,17 @@ str: 'maximum timer seconds are [_1]'
 id: command.timer.msg.registered
 str: 'Timer has been registered.'
 
+# logs command
+---
+id: command.logs.help.syntax
+str: '~[<channel> <offset_hours>~]'
+---
+id: command.logs.help.description
+str: 'request a link to channel chat logs from a given offset range'
+---
+id: command.logs.err.bad_channel
+str: '#channel must be specified in a private conversation'
+---
+id: command.logs.err.bad_offset
+str: 'offset must be positive and not greater than [_1]'
+

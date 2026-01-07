@@ -1,0 +1,9 @@
+% layout 'default', title => 'Logs';
+
+<p>Logs from channel <%= $channel %></p>
+<pre>
+% foreach my $message ($messages->@*) {
+	%= $message
+% }
+</pre>
+
