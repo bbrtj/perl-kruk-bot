@@ -9,6 +9,7 @@ use Encode qw(encode decode);
 
 use Bot::Schema::Snippet;
 use Bot::Log;
+use Bot::Logs;
 use Web;
 
 use constant MAX_IRC_MESSAGE_LENGTH => 430;
@@ -58,6 +59,20 @@ has field 'connected' => (
 	default => !!0,
 );
 
+has param 'logged_channels' => (
+	isa => ArrayRef,
+	lazy => sub ($self) {
+		[split /,/, $ENV{KRUK_LOGGED_CHANNELS} // '']
+	}
+);
+
+has field 'logs' => (
+	isa => InstanceOf ['Bot::Logs'],
+	default => sub {
+		Bot::Logs->new;
+	},
+);
+
 sub dispatch ($self, $msg)
 {
 	my ($channel, $line) = $msg->{params}->@*;
@@ -68,6 +83,10 @@ sub dispatch ($self, $msg)
 		|| (!$is_private && any { $_ eq $channel } split /,/, $conf->{channel});
 
 	my ($user) = $msg->{prefix} =~ /^(@{[NICK_RE]})/;
+
+	if (!$is_private && any { $_ eq $channel } $self->logged_channels->@*) {
+		$self->logs->store($channel, $user, $line);
+	}
 
 	my $for_me = $is_private;
 	if (!$for_me && $line =~ /^(@{[NICK_RE]}):/) {

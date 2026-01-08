@@ -14,7 +14,6 @@ use Kruk;
 use Bot::I18N;
 use Bot::Log;
 use Bot::Notes;
-use Bot::Logs;
 use Bot::Cache;
 use Bot::Context;
 use Bot::Conversation;
@@ -52,13 +51,6 @@ has param 'trusted_users' => (
 	isa => ArrayRef,
 	lazy => sub ($self) {
 		[split /,/, $ENV{KRUK_TRUSTED_USERS} // $self->owner]
-	}
-);
-
-has param 'logged_channels' => (
-	isa => ArrayRef,
-	lazy => sub ($self) {
-		[split /,/, $ENV{KRUK_LOGGED_CHANNELS} // '']
 	}
 );
 
@@ -114,13 +106,6 @@ has field 'notes' => (
 	isa => InstanceOf ['Bot::Notes'],
 	default => sub {
 		Bot::Notes->new;
-	},
-);
-
-has field 'logs' => (
-	isa => InstanceOf ['Bot::Logs'],
-	default => sub {
-		Bot::Logs->new;
 	},
 );
 
@@ -440,11 +425,6 @@ sub add_message ($self, $ctx)
 	push @$msgs, [$ctx->user, $ctx->message];
 
 	splice @$msgs, 0, -1 * $self->config->history_size;
-
-	my $channel = $ctx->channel;
-	if ($channel && any { $_ eq $channel } $self->logged_channels->@*) {
-		$self->logs->store($channel, $ctx->user, $ctx->message);
-	}
 }
 
 sub query ($self, $ctx)
