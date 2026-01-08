@@ -22,8 +22,12 @@ sub retrieve ($self, $channel, $from, $to)
 	return Bot::Schema::Log::Manager->get_logs(
 		query => [
 			channel => $channel,
-			created_at => {gt => $from, lt => $to},
-		]
+			created_at => {lt => $to},
+			and => [
+				created_at => {gt => $from},
+			],
+		],
+		sort_by => 'created_at ASC',
 	);
 }
 
