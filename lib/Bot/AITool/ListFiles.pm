@@ -11,11 +11,11 @@ extends 'Bot::AITool';
 
 use constant name => 'list_files';
 
-has param 'directory' => (
+has option 'directory' => (
 	isa => Str,
 );
 
-has field 'storage' => (
+has param 'storage' => (
 	isa => InstanceOf ['Storage::Abstract'],
 	default => sub ($self) {
 		Storage::Abstract->new(

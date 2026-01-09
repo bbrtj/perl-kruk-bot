@@ -1,18 +1,20 @@
 # HARNESS-DURATION-MEDIUM
 use Test2::V0;
+use Storage::Abstract;
 use Bot;
 
 use v5.40;
 use utf8;
 
-use Bot::AITool::Perldoc;
-
 my $bot = Bot->new(environment => 'test');
+
+my $memory_storage = Storage::Abstract->new(driver => 'memory');
 
 $bot->tools->%* = (
 	$bot->tools->%*,
 	Bot::AITool::Perldoc->register($bot),
 	Bot::AITool::ListFiles->register($bot, directory => '.'),
+	Bot::AITool::WriteFiles->register($bot, storage => $memory_storage),
 );
 
 sub build_context ($message)
@@ -183,6 +185,33 @@ subtest 'should list files' => sub {
 	is $last_message->[0], 'user', 'last entry is user role ok';
 	like $last_message->[1][0]{content}[0]{text}, qr{t/tools.t}, 'module content ok (tools.t)';
 	like $last_message->[1][0]{content}[0]{text}, qr{lib/Bot.pm}, 'module content ok (Bot.pm)';
+};
+
+subtest 'should modify files partially' => sub {
+	$memory_storage->store('/test', \"abc\n  def\n  ghi");
+
+	my $ctx = build_context('replace a part of a file');
+	my $p = $bot->use_tool(
+		$ctx, {
+			name => 'write_files',
+			input => {
+				file_path => '/test',
+				pattern => "  def\n  ghi",
+				contents => 'jkl'
+			}
+		}
+	);
+
+	$p->wait if $p;
+
+	my $conv = $bot->get_conversation($ctx);
+	my $last_message = $conv->messages->[-1];
+	is $last_message->[0], 'user', 'last entry is user role ok';
+	like $last_message->[1][0]{content}[0]{text}, qr{\Qfile has been saved\E}, 'file saved ok';
+
+	my $fh = $memory_storage->retrieve('/test');
+	my $content = join '', readline $fh;
+	is $content, "abc\njkl", 'replaced ok';
 };
 
 done_testing;

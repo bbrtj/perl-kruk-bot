@@ -7,9 +7,6 @@ use lib curfile->dirname->dirname->child('lib')->to_string;
 use Env::Dot;
 use Bot;
 
-use Bot::AITool::AccessFiles;
-use Bot::AITool::ListFiles;
-
 binmode STDOUT, ':encoding(UTF-8)';
 binmode STDIN, ':encoding(UTF-8)';
 
@@ -38,7 +35,8 @@ my $bot = Bot->new(
 $bot->tools->%* = (
 	Bot::AITool::SaveUserNote->register($bot),
 	Bot::AITool::Perldoc->register($bot),
-	Bot::AITool::AccessFiles->register($bot, directory => $directory),
+	Bot::AITool::WriteFiles->register($bot, directory => $directory),
+	Bot::AITool::ReadFiles->register($bot, directory => $directory),
 	Bot::AITool::ListFiles->register($bot, directory => $directory),
 	Bot::AITool::MoveFiles->register($bot, directory => $directory),
 );

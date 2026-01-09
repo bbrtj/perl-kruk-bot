@@ -1,4 +1,4 @@
-package Bot::AITool::MoveFiles;
+package Bot::AITool::ReadFiles;
 
 use v5.40;
 
@@ -9,7 +9,7 @@ use Storage::Abstract;
 
 extends 'Bot::AITool';
 
-use constant name => 'move_files';
+use constant name => 'read_files';
 
 has option 'directory' => (
 	isa => Str,
@@ -30,18 +30,14 @@ sub _build_definition ($self)
 	return {
 		name => $self->name,
 		description =>
-			q{Rename files by moving them from one location to another},
+			q{Read a file on user's machine. Use this to understand the project better},
 		input_schema => {
 			type => 'object',
-			required => ['old_name', 'new_name'],
+			required => ['file_path'],
 			properties => {
-				old_name => {
+				file_path => {
 					type => 'string',
-					description => 'Name of the existing file',
-				},
-				new_name => {
-					type => 'string',
-					description => 'New name of the file',
+					description => 'Relative path to a file inside this project. Uses unix directory separators',
 				},
 			},
 		},
@@ -50,19 +46,15 @@ sub _build_definition ($self)
 
 sub runner ($self, $ctx, $input)
 {
-	$ctx->add_to_response("moving $input->{old_name} to $input->{new_name}");
+	my $file = $input->{file_path};
+	$ctx->add_to_response("reading $file");
 
 	try {
-		my $fh = $self->storage->retrieve($input->{old_name});
-		$self->storage->store($input->{new_name}, $fh);
-		close $fh;
-
-		$self->storage->dispose($input->{old_name});
+		my $fh = $self->storage->retrieve($file);
+		return join '', readline $fh;
 	}
 	catch ($ex) {
 		return "Exception occured: $ex";
 	}
-
-	return 'done';
 }
 
