@@ -50,7 +50,9 @@ sub dump ($self, %args)
 
 		return join "\n", grep { defined }
 			$args{prefix},
-			@note_texts;
+			'```',
+			@note_texts,
+			'```',
 	}
 
 	return '';

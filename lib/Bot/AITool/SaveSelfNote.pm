@@ -15,7 +15,7 @@ sub _build_definition ($self)
 	return {
 		name => $self->name,
 		description =>
-			q{Save an important note about yourself, the chatbot. Use this when the user asks you to remember something about yourself.},
+			q{Save an important note about yourself, the chatbot. Use this when the user asks you to remember something for the future.},
 		input_schema => {
 			type => 'object',
 			required => ['note'],
