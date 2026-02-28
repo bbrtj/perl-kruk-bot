@@ -49,7 +49,7 @@ sub runner ($self, $ctx, $input)
 {
 	$ctx->add_to_response("searching for $input->{extensions}");
 
-	my @files = $self->storage->list->@*;
+	my @files = $self->storage->list(undef, recursive => !!1)->@*;
 
 	# exclude dotfiles
 	@files = grep { $_ !~ m{^\.|/\.} } @files;

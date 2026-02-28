@@ -17,7 +17,7 @@ requires 'DBD::SQLite';
 requires 'Cpanel::JSON::XS';
 requires 'YAML::PP';
 
-requires 'Storage::Abstract';
+requires 'Storage::Abstract' => '0.008';
 
 on test => sub {
 	requires 'Test2::V0';

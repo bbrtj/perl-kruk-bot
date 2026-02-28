@@ -1496,6 +1496,18 @@ DISTRIBUTIONS
       Type::Tiny 2
       namespace::autoclean 0
       perl 5.014
+  Mooish-Base-1.003
+    pathname: B/BR/BRTASTIC/Mooish-Base-1.003.tar.gz
+    provides:
+      Mooish::Base 1.003
+    requirements:
+      ExtUtils::MakeMaker 0
+      Import::Into 1.002005
+      Moo 2.004000
+      Mooish::AttributeBuilder 1.002
+      Type::Tiny 2.010001
+      namespace::autoclean 0.19
+      perl 5.010
   Net-SSLeay-1.94
     pathname: C/CH/CHRISN/Net-SSLeay-1.94.tar.gz
     provides:
@@ -1900,33 +1912,30 @@ DISTRIBUTIONS
       strict 0
       version 0.83
       warnings 0
-  Storage-Abstract-0.007
-    pathname: B/BR/BRTASTIC/Storage-Abstract-0.007.tar.gz
+  Storage-Abstract-0.008
+    pathname: B/BR/BRTASTIC/Storage-Abstract-0.008.tar.gz
     provides:
-      Storage::Abstract 0.007
-      Storage::Abstract::Driver 0.007
-      Storage::Abstract::Driver::Composite 0.007
-      Storage::Abstract::Driver::Directory 0.007
-      Storage::Abstract::Driver::Memory 0.007
-      Storage::Abstract::Driver::Null 0.007
-      Storage::Abstract::Driver::Subpath 0.007
-      Storage::Abstract::Driver::Superpath 0.007
-      Storage::Abstract::Handle 0.007
-      Storage::Abstract::Role::Driver::Basic 0.007
-      Storage::Abstract::Role::Driver::Meta 0.007
-      Storage::Abstract::X 0.007
-      Storage::Abstract::X::HandleError 0.007
-      Storage::Abstract::X::NotFound 0.007
-      Storage::Abstract::X::PathError 0.007
-      Storage::Abstract::X::Readonly 0.007
-      Storage::Abstract::X::StorageError 0.007
+      Storage::Abstract 0.008
+      Storage::Abstract::Driver 0.008
+      Storage::Abstract::Driver::Composite 0.008
+      Storage::Abstract::Driver::Directory 0.008
+      Storage::Abstract::Driver::Memory 0.008
+      Storage::Abstract::Driver::Null 0.008
+      Storage::Abstract::Driver::Subpath 0.008
+      Storage::Abstract::Driver::Superpath 0.008
+      Storage::Abstract::Handle 0.008
+      Storage::Abstract::Role::Driver::Basic 0.008
+      Storage::Abstract::Role::Driver::Meta 0.008
+      Storage::Abstract::X 0.008
+      Storage::Abstract::X::HandleError 0.008
+      Storage::Abstract::X::NotFound 0.008
+      Storage::Abstract::X::PathError 0.008
+      Storage::Abstract::X::Readonly 0.008
+      Storage::Abstract::X::StorageError 0.008
     requirements:
       ExtUtils::MakeMaker 0
       List::Util 1.33
-      Moo 2
-      Mooish::AttributeBuilder 1.002
-      Type::Tiny 2
-      namespace::autoclean 0
+      Mooish::Base 1.003
       perl 5.014
   Sub-Exporter-0.991
     pathname: R/RJ/RJBS/Sub-Exporter-0.991.tar.gz
@@ -2099,6 +2108,64 @@ DISTRIBUTIONS
       Types::Standard::Tied 2.006000
       Types::Standard::Tuple 2.006000
       Types::TypeTiny 2.006000
+    requirements:
+      Exporter::Tiny 1.006000
+      ExtUtils::MakeMaker 6.17
+      perl 5.008001
+  Type-Tiny-2.010001
+    pathname: T/TO/TOBYINK/Type-Tiny-2.010001.tar.gz
+    provides:
+      Devel::TypeTiny::Perl58Compat 2.010001
+      Error::TypeTiny 2.010001
+      Error::TypeTiny::Assertion 2.010001
+      Error::TypeTiny::Compilation 2.010001
+      Error::TypeTiny::WrongNumberOfParameters 2.010001
+      Eval::TypeTiny 2.010001
+      Eval::TypeTiny::CodeAccumulator 2.010001
+      Reply::Plugin::TypeTiny 2.010001
+      Test::TypeTiny 2.010001
+      Type::Coercion 2.010001
+      Type::Coercion::FromMoose 2.010001
+      Type::Coercion::Union 2.010001
+      Type::Library 2.010001
+      Type::Params 2.010001
+      Type::Params::Alternatives 2.010001
+      Type::Params::Parameter 2.010001
+      Type::Params::Signature 2.010001
+      Type::Parser 2.010001
+      Type::Parser::AstBuilder 2.010001
+      Type::Parser::Token 2.010001
+      Type::Parser::TokenStream 2.010001
+      Type::Registry 2.010001
+      Type::Tie 2.010001
+      Type::Tie::ARRAY 2.010001
+      Type::Tie::BASE 2.010001
+      Type::Tie::HASH 2.010001
+      Type::Tie::SCALAR 2.010001
+      Type::Tiny 2.010001
+      Type::Tiny::Bitfield 2.010001
+      Type::Tiny::Class 2.010001
+      Type::Tiny::ConstrainedObject 2.010001
+      Type::Tiny::Duck 2.010001
+      Type::Tiny::Enum 2.010001
+      Type::Tiny::Intersection 2.010001
+      Type::Tiny::Role 2.010001
+      Type::Tiny::Union 2.010001
+      Type::Utils 2.010001
+      Types::Common 2.010001
+      Types::Common::Numeric 2.010001
+      Types::Common::String 2.010001
+      Types::Standard 2.010001
+      Types::Standard::ArrayRef 2.010001
+      Types::Standard::CycleTuple 2.010001
+      Types::Standard::Dict 2.010001
+      Types::Standard::HashRef 2.010001
+      Types::Standard::Map 2.010001
+      Types::Standard::ScalarRef 2.010001
+      Types::Standard::StrMatch 2.010001
+      Types::Standard::Tied 2.010001
+      Types::Standard::Tuple 2.010001
+      Types::TypeTiny 2.010001
     requirements:
       Exporter::Tiny 1.006000
       ExtUtils::MakeMaker 6.17
