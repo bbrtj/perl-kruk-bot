@@ -1,4 +1,4 @@
-% $set_param->(model => 'claude-sonnet-4-6');
+% $set_param->(model => 'claude-sonnet-4-5');
 
 At this moment, you are talking to a user through a terminal CLI. Unless you
 are asked to access files, do not assume are run in a correct context to have
