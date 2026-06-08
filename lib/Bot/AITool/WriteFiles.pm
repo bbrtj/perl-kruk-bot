@@ -6,6 +6,7 @@ use Mooish::Base;
 
 use Bot::I18N;
 use Storage::Abstract;
+use Encode qw(encode);
 
 extends 'Bot::AITool';
 
@@ -75,6 +76,7 @@ sub runner ($self, $ctx, $input)
 			$new_content = $content;
 		}
 
+		$new_content = encode 'UTF-8', $new_content;
 		$self->storage->store($file, \$new_content);
 		return "file has been saved";
 	}
