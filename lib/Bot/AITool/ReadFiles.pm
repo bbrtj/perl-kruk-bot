@@ -6,6 +6,7 @@ use Mooish::Base;
 
 use Bot::I18N;
 use Storage::Abstract;
+use Encode qw(decode);
 
 extends 'Bot::AITool';
 
@@ -51,7 +52,7 @@ sub runner ($self, $ctx, $input)
 
 	try {
 		my $fh = $self->storage->retrieve($file);
-		return join '', readline $fh;
+		return decode 'UTF-8', join '', readline $fh;
 	}
 	catch ($ex) {
 		return "Exception occured: $ex";
