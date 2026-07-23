@@ -9,16 +9,13 @@ use Mojo::IOLoop;
 
 extends 'Mojolicious::Controller';
 
-has field 'snippet_lifetime' => (
-	isa => PositiveInt,
-	default => sub { $ENV{KRUK_SNIPPET_LIFETIME} * 60 },
-);
+use constant SNIPPET_LIFETIME => $ENV{KRUK_SNIPPET_LIFETIME} * 60;
 
-sub BUILD ($self, $)
+sub setup_actions ($class)
 {
 	Mojo::IOLoop->singleton->recurring(
 		60 => sub {
-			my $threshold = time - $self->snippet_lifetime;
+			my $threshold = time - SNIPPET_LIFETIME;
 
 			my $expired = Bot::Schema::Snippet::Manager->get_snippets(
 				query => [

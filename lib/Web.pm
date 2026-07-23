@@ -22,6 +22,11 @@ sub startup ($self)
 	my $r = $self->routes;
 	$r->get('/snippet/:snippet_id')->to('snippet#fetch')->name('snippet');
 	$r->get('/logs/:channel/:from')->to('logs#show')->name('logs');
+
+	require Web::Controller::Logs;
+	require Web::Controller::Snippet;
+	Web::Controller::Logs->setup_actions;
+	Web::Controller::Snippet->setup_actions;
 }
 
 sub url_for ($self, @args)

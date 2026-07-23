@@ -10,16 +10,13 @@ use Mojo::IOLoop;
 
 extends 'Mojolicious::Controller';
 
-has field 'log_lifetime' => (
-	isa => PositiveInt,
-	default => sub { $ENV{KRUK_LOG_LIFETIME} * 60 * 60 * 24 },
-);
+use constant LOG_LIFETIME => $ENV{KRUK_LOG_LIFETIME} * 60 * 60 * 24;
 
-sub BUILD ($self, $)
+sub setup_actions ($class)
 {
 	Mojo::IOLoop->singleton->recurring(
 		3600 => sub {
-			my $threshold = time - $self->log_lifetime;
+			my $threshold = time - LOG_LIFETIME;
 
 			my $expired = Bot::Schema::Log::Manager->get_logs(
 				query => [
