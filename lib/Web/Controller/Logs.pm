@@ -19,7 +19,7 @@ sub BUILD ($self, $)
 {
 	Mojo::IOLoop->singleton->recurring(
 		3600 => sub {
-			my $threshold = time - $self->snippet_lifetime;
+			my $threshold = time - $self->log_lifetime;
 
 			my $expired = Bot::Schema::Log::Manager->get_logs(
 				query => [
