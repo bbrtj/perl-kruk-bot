@@ -45,7 +45,7 @@ sub fetch ($self)
 	$self->render(
 		template => 'snippet/fetch',
 		item => $item,
-		expiration => $timestamp + $self->snippet_lifetime,
+		expiration => $timestamp + SNIPPET_LIFETIME,
 	);
 }
 
