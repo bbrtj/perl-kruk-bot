@@ -58,10 +58,17 @@ has option 'extra_prompts' => (
 	isa => ArrayRef [Str],
 );
 
-has field 'claude_api_key' => (
+has field 'api_url' => (
+	isa => Str,
+	default => sub {
+		$ENV{KRUK_API_URL};
+	},
+);
+
+has field 'api_key' => (
 	isa => Maybe [SimpleStr],
 	default => sub {
-		$ENV{KRUK_CLAUDE_API_KEY};
+		$ENV{KRUK_API_KEY};
 	},
 );
 
@@ -284,7 +291,7 @@ sub _process_query_data ($self, $ctx, $json)
 
 sub _can_use_ai ($self, $ctx)
 {
-	return defined $self->claude_api_key && ($ctx->has_channel || $ctx->user_of($self->trusted_users));
+	return defined $self->api_key && ($ctx->has_channel || $ctx->user_of($self->trusted_users));
 }
 
 sub get_context ($self, @params)
@@ -377,9 +384,9 @@ sub _query ($self, $ctx)
 	my $cached_data = $self->cache->process_cache($ctx, $data);
 
 	return $self->ua->post_p(
-		'https://api.anthropic.com/v1/messages',
+		$self->api_url,
 		{
-			'x-api-key' => $self->claude_api_key,
+			'x-api-key' => $self->api_key,
 			'anthropic-version' => '2023-06-01',
 		},
 		json => $data
@@ -387,7 +394,7 @@ sub _query ($self, $ctx)
 		sub ($tx) {
 			my $res = $tx->result;
 			if (!$res->is_success) {
-				$self->log->error('AI query HTTP error: ' . $res->text);
+				$self->log->error(sprintf 'AI query HTTP error %s: %s', $res->code, $res->text);
 				die {retry => !!1};
 			}
 
